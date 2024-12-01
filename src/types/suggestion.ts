@@ -3,6 +3,7 @@ export interface Suggestion {
 	userId: string
 	malId: number
 	title: string
+	description: string
 	synopsis: string
 	image: string
 	type: string
