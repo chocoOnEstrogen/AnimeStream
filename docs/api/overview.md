@@ -1,8 +1,8 @@
 ---
 title: API Reference
 description: Complete reference for the AnimeStream API
-dateAdded: 2024-03-21
-lastUpdated: 2024-03-21
+dateAdded: 2024-12-01T21:50:34.061Z
+lastUpdated: 2024-12-01T21:50:34.061Z
 author: "1248626823638552701"
 tags: ["api", "reference"]
 icon: "globe"
