@@ -19,6 +19,7 @@ import { storage } from './utils/storage'
 import suggestRouter from './routes/suggestions'
 import cors from 'cors'
 import http from 'http'
+import apiRouter from './routes/api'
 
 dotenv.config()
 
@@ -274,6 +275,7 @@ app.use('/users', userRouter)
 app.use('/watch', watchRouter)
 app.use('/admin', adminRouter)
 app.use('/suggest', suggestRouter)
+app.use('/api', apiRouter)
 
 // Basic error handler
 app.use(
