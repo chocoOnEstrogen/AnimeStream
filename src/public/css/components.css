@@ -1,0 +1,322 @@
+
+.doc-alert {
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.doc-alert-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    padding-top: 0.125rem;
+}
+
+.doc-alert-content {
+    flex: 1;
+}
+
+.doc-alert-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Info Alert */
+.doc-alert-info {
+    border-color: var(--bs-info);
+}
+
+.doc-alert-info .doc-alert-icon {
+    color: var(--bs-info);
+}
+
+/* Warning Alert */
+.doc-alert-warning {
+    border-color: var(--bs-warning);
+}
+
+.doc-alert-warning .doc-alert-icon {
+    color: var(--bs-warning);
+}
+
+/* Danger Alert */
+.doc-alert-danger {
+    border-color: var(--bs-danger);
+}
+
+.doc-alert-danger .doc-alert-icon {
+    color: var(--bs-danger);
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .doc-alert {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Alert Content Styles */
+.doc-alert-content p:last-child {
+    margin-bottom: 0;
+}
+
+.doc-alert-content code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.doc-alert-content a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.doc-alert-content a:hover {
+    text-decoration-style: solid;
+}
+
+
+.doc-api-tester {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    overflow: hidden;
+}
+
+.doc-api-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.doc-api-method {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.doc-api-method-get {
+    background: rgba(var(--bs-success-rgb), 0.1);
+    color: var(--bs-success);
+}
+
+.doc-api-method-post {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+
+.doc-api-method-put {
+    background: rgba(var(--bs-warning-rgb), 0.1);
+    color: var(--bs-warning);
+}
+
+.doc-api-method-delete {
+    background: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+}
+
+.doc-api-endpoint {
+    font-family: var(--bs-font-monospace);
+    color: var(--bs-secondary-color);
+}
+
+.doc-api-description {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--bs-secondary-color);
+}
+
+.doc-api-params {
+    padding: 1.5rem;
+}
+
+.doc-api-param-group {
+    margin-bottom: 1.5rem;
+}
+
+.doc-api-param-group:last-child {
+    margin-bottom: 0;
+}
+
+.doc-api-param-title {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.75rem;
+}
+
+.doc-api-param {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.doc-api-param:last-child {
+    margin-bottom: 0;
+}
+
+.doc-api-param input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    color: var(--bs-body-color);
+    font-family: var(--bs-font-monospace);
+    font-size: 0.875rem;
+}
+
+.doc-api-param input:focus {
+    outline: none;
+    border-color: var(--bs-primary);
+}
+
+.doc-api-param-required {
+    color: var(--bs-danger);
+    font-size: 0.75rem;
+}
+
+.doc-api-param-description {
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+}
+
+.doc-api-actions {
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.doc-api-response {
+    padding: 1.5rem;
+    background: var(--bs-dark);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    display: none;
+}
+
+.doc-api-response.show {
+    display: block;
+}
+
+.doc-api-response pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.doc-api-response-success {
+    border-left: 4px solid var(--bs-success);
+}
+
+.doc-api-response-error {
+    border-left: 4px solid var(--bs-danger);
+}
+
+.doc-api-examples {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.doc-api-example {
+    margin-bottom: 1.5rem;
+}
+
+.doc-api-example:last-child {
+    margin-bottom: 0;
+}
+
+.doc-api-example-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.doc-api-example-status-2xx {
+    color: var(--bs-success);
+}
+
+.doc-api-example-status-4xx,
+.doc-api-example-status-5xx {
+    color: var(--bs-danger);
+}
+
+
+.doc-callout {
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+    border-left: 0.25rem solid;
+}
+
+.doc-callout-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.doc-callout-note {
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    border-color: var(--bs-primary);
+}
+
+.doc-callout-tip {
+    background: rgba(var(--bs-success-rgb), 0.05);
+    border-color: var(--bs-success);
+}
+
+.doc-callout-important {
+    background: rgba(var(--bs-warning-rgb), 0.05);
+    border-color: var(--bs-warning);
+}
+
+.doc-callout-caution {
+    background: rgba(var(--bs-danger-rgb), 0.05);
+    border-color: var(--bs-danger);
+}
+
+
+.doc-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: transform 0.2s;
+}
+
+.doc-card:hover {
+    transform: translateY(-2px);
+}
+
+.doc-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.doc-card-icon {
+    font-size: 1.5rem;
+    color: var(--bs-primary);
+}
+
+.doc-card-content {
+    color: var(--bs-secondary-color);
+}
+

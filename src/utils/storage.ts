@@ -169,6 +169,7 @@ class Storage {
 	async getAnime(id: string): Promise<Anime | null> {
 		await this.refreshAnimeCache()
 		if (id === 'undefined') return null
+		console.log(this.animeCache)
 		return this.animeCache.get(id) || null
 	}
 

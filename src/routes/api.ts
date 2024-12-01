@@ -31,7 +31,9 @@ router.get('/anime', async (req: Request, res: Response) => {
 //@ts-ignore
 router.get('/anime/:id', async (req: Request, res: Response) => {
     try {
+        console.log(req.params.id)
         const anime = await storage.getAnime(req.params.id)
+        console.log(anime)
         if (!anime) {
             return res.status(404).json({ error: 'Anime not found' })
         }

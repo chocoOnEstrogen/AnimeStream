@@ -20,6 +20,7 @@ import suggestRouter from './routes/suggestions'
 import cors from 'cors'
 import http from 'http'
 import apiRouter from './routes/api'
+import docsRouter from './routes/docs'
 
 dotenv.config()
 
@@ -276,6 +277,7 @@ app.use('/watch', watchRouter)
 app.use('/admin', adminRouter)
 app.use('/suggest', suggestRouter)
 app.use('/api', apiRouter)
+app.use('/docs', docsRouter)
 
 // Basic error handler
 app.use(

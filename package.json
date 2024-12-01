@@ -8,9 +8,10 @@
   },
   "scripts": {
     "format": "prettier --cache --write . --ignore-path .prettierignore",
-    "build": "tsc && node tools/copy.js",
+    "build": "npm run build:docs && tsc && node tools/copy.js",
     "dev": "ts-node src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "build:docs": "ts-node src/build/docs.ts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,8 @@
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
+    "@types/glob": "^8.1.0",
+    "@types/marked": "^5.0.2",
     "@types/session-file-store": "^1.2.5",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
@@ -41,7 +44,11 @@
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "express-session": "^1.18.1",
+    "glob": "^11.0.0",
+    "gray-matter": "^4.0.3",
+    "highlight.js": "^11.10.0",
     "mal-scraper": "^2.13.2",
+    "marked": "^15.0.3",
     "session-file-store": "^1.5.0"
   }
 }

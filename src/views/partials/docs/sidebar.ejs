@@ -1,0 +1,173 @@
+<div class="col-md-3 col-lg-2 d-md-block sidebar">
+    <div class="position-sticky">
+        <!-- Search -->
+        <div class="p-3">
+            <div class="input-group">
+                <span class="input-group-text border-end-0 bg-body">
+                    <i class="bi bi-search opacity-75"></i>
+                </span>
+                <input type="text" 
+                       class="form-control border-start-0"
+                       id="searchDocs" 
+                       placeholder="Search docs...">
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-groups">
+            <% categories.forEach(category => { %>
+                <div class="nav-group">
+                    <h6 class="nav-group-title text-uppercase px-3 py-2">
+                        <%= category %>
+                    </h6>
+                    <div class="nav-group-items">
+                        <% docs
+                            .filter(doc => doc.category === category)
+                            .sort((a, b) => (a.metadata.order || 999) - (b.metadata.order || 999))
+                            .forEach(doc => { %>
+                            <a class="nav-link d-flex align-items-center <%= locals.currentSlug === doc.slug && locals.currentCategory === category ? 'active' : '' %>" 
+                               href="/docs/<%= doc.category %>/<%= doc.slug %>">
+                                <span class="me-2 nav-link-icon">
+                                    <% if (doc.metadata.icon) { %>
+                                        <i class="bi bi-<%= doc.metadata.icon %>"></i>
+                                    <% } %>
+                                </span>
+                                <span class="nav-link-title"><%= doc.title %></span>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            <% }) %>
+        </nav>
+    </div>
+</div>
+
+<style>
+/* Sidebar Styles */
+.sidebar {
+    height: 100vh;
+    background: var(--bs-dark-bg-subtle);
+    border-right: 1px solid var(--bs-border-color);
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 60px; /* Adjust based on your navbar height */
+}
+
+/* Search Styles */
+.input-group {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.input-group-text,
+.form-control {
+    border-color: var(--bs-border-color);
+    background: var(--bs-body-bg);
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--bs-primary);
+}
+
+/* Navigation Styles */
+.nav-groups {
+    padding: 0.5rem 0;
+}
+
+.nav-group {
+    margin-bottom: 1rem;
+}
+
+.nav-group-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    margin: 0;
+    padding: 0.5rem 1rem;
+    letter-spacing: 0.05em;
+}
+
+.nav-group-items {
+    padding: 0;
+}
+
+.nav-link {
+    color: var(--bs-body-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.nav-link.active {
+    color: var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    font-weight: 500;
+}
+
+.nav-link-icon {
+    opacity: 0.7;
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 1rem;
+    }
+}
+
+/* Dark Mode Adjustments */
+[data-bs-theme="dark"] .sidebar {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+[data-bs-theme="dark"] .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .nav-link.active {
+    background: rgba(255, 255, 255, 0.1);
+}
+</style>
+
+<script>
+// Enhanced search functionality
+document.getElementById('searchDocs')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase()
+    const navGroups = document.querySelectorAll('.nav-group')
+    
+    navGroups.forEach(group => {
+        const links = group.querySelectorAll('.nav-link')
+        let hasVisibleLinks = false
+        
+        links.forEach(link => {
+            const text = link.textContent?.toLowerCase() || ''
+            const isVisible = text.includes(searchTerm)
+            link.style.display = isVisible ? '' : 'none'
+            if (isVisible) hasVisibleLinks = true
+        })
+        
+        // Hide/show entire group based on if it has visible links
+        group.style.display = hasVisibleLinks ? '' : 'none'
+    })
+})
+
+// Scroll active link into view on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const activeLink = document.querySelector('.nav-link.active')
+    if (activeLink) {
+        activeLink.scrollIntoView({ block: 'center' })
+    }
+})
+</script>

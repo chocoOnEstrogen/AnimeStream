@@ -28,7 +28,8 @@ function copyDir(src, dest) {
 
 // Directories to copy
 const dirs = [
-    'views'
+    'views',
+    'public'
 ];
 
 // Copy each directory

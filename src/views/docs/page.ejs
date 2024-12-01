@@ -1,0 +1,494 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <%- include('../partials/docs/sidebar') %>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/docs">Docs</a></li>
+                            <li class="breadcrumb-item"><%= currentCategory.toUpperCase() %></li>
+                            <li class="breadcrumb-item active"><%= title %></li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2"><%= title %></h1>
+                    <% if (metadata.description) { %>
+                        <p class="lead text-body-secondary"><%= metadata.description %></p>
+                    <% } %>
+                    <% if (metadata.tags?.length > 0) { %>
+                        <div class="mb-3">
+                            <% metadata.tags.forEach(tag => { %>
+                                <span class="badge bg-primary me-1 doc-tag" style="background-color: var(--bs-primary);"><%= tag %></span>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary" onclick="window.print()">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                    <a href="https://github.com/chocoOnEstrogen/AnimeStream/edit/master/docs/<%= currentCategory %>/<%= currentSlug %>.md" 
+                       target="_blank"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-9">
+                    <!-- Article content -->
+                    <article class="markdown-body">
+                        <%- content %>
+                    </article>
+
+                    <!-- Related docs -->
+                    <% if (relatedDocs?.length > 0) { %>
+                        <div class="mt-5 pt-3 border-top">
+                            <h5>Related Documentation</h5>
+                            <div class="row row-cols-1 row-cols-md-2 g-4">
+                                <% relatedDocs.forEach(doc => { %>
+                                    <div class="col">
+                                        <a href="/docs/<%= doc.category %>/<%= doc.slug %>" 
+                                           class="card h-100 text-decoration-none">
+                                            <div class="card-body">
+                                                <h6 class="card-title"><%= doc.title %></h6>
+                                                <p class="card-text small text-body-secondary">
+                                                    <%= doc.metadata.description %>
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Metadata -->
+                    <div class="mt-5 pt-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <% if (metadata.dateAdded) { %>
+                                    <p class="text-body-secondary mb-1">
+                                        Added: <%= new Date(metadata.dateAdded).toLocaleDateString() %>
+                                    </p>
+                                <% } %>
+                                <% if (metadata.lastUpdated) { %>
+                                    <p class="text-body-secondary mb-0">
+                                        Updated: <%= new Date(metadata.lastUpdated).toLocaleDateString() %>
+                                    </p>
+                                <% } %>
+                            </div>
+                            <% if (author) { %>
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cdn.discordapp.com/avatars/<%= author.id %>/<%= author.avatar %>.png" 
+                                         alt=""
+                                         class="rounded-circle me-2"
+                                         width="32"
+                                         height="32">
+                                    <div class="small">
+                                        <p class="mb-0 text-body-secondary">Written by</p>
+                                        <p class="mb-0"><%= author.username %></p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="col-lg-3">
+                    <div class="toc-wrapper position-sticky" style="top: 2rem;">
+                        <div id="toc" class="toc">
+                            <!-- TOC will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+/* Enhanced styles */
+.markdown-body {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.markdown-body code {
+    padding: 0.2em 0.4em;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-radius: 3px;
+}
+
+.code-block {
+    margin: 1rem 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bs-dark);
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.code-language {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+    text-transform: uppercase;
+}
+
+.copy-button {
+    background: none;
+    border: none;
+    color: var(--bs-secondary-color);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s;
+}
+
+.copy-button:hover {
+    color: var(--bs-primary);
+}
+
+.markdown-body pre code {
+    padding: 1em;
+    border-radius: 0;
+    background-color: var(--bs-dark) !important;
+}
+
+.alert {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-left: 4px solid transparent;
+}
+
+.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    border-left-color: var(--bs-info);
+}
+
+.alert-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.1);
+    border-left-color: var(--bs-warning);
+}
+
+.alert-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    border-left-color: var(--bs-danger);
+}
+
+.toc-wrapper {
+    padding: 1rem;
+    background: var(--bs-dark-bg-subtle);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.toc h6 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--bs-secondary-color);
+    margin-bottom: 1rem;
+}
+
+.toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc ul ul {
+    padding-left: 1rem;
+}
+
+.toc li {
+    margin-bottom: 0.5rem;
+}
+
+.toc a {
+    color: var(--bs-body-color);
+    text-decoration: none;
+    display: block;
+    padding: 0.25rem 0;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.toc a:hover {
+    color: var(--bs-primary);
+    opacity: 1;
+}
+
+.toc a.active {
+    color: var(--bs-primary);
+    font-weight: 500;
+}
+
+@media (max-width: 991.98px) {
+    .toc-wrapper {
+        display: none;
+    }
+}
+
+@media print {
+    .sidebar, .toc-wrapper, .btn-group {
+        display: none !important;
+    }
+    .col-lg-9 {
+        width: 100% !important;
+    }
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Info Alert */
+.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    border-left: 4px solid var(--bs-info);
+}
+
+.alert-info .alert-icon {
+    color: var(--bs-info);
+}
+
+/* Warning Alert */
+.alert-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.1);
+    border-left: 4px solid var(--bs-warning);
+}
+
+.alert-warning .alert-icon {
+    color: var(--bs-warning);
+}
+
+/* Danger Alert */
+.alert-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    border-left: 4px solid var(--bs-danger);
+}
+
+.alert-danger .alert-icon {
+    color: var(--bs-danger);
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .alert {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Alert Content Styles */
+.alert-content {
+    flex: 1;
+}
+
+.alert-content p:last-child {
+    margin-bottom: 0;
+}
+
+.alert-content code.inline-code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.alert-content a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.alert-content a:hover {
+    text-decoration-style: solid;
+}
+
+/* Info Alert */
+.alert-info .alert-content a {
+    color: var(--bs-info);
+}
+
+/* Warning Alert */
+.alert-warning .alert-content a {
+    color: var(--bs-warning);
+}
+
+/* Danger Alert */
+.alert-danger .alert-content a {
+    color: var(--bs-danger);
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .alert-content code.inline-code {
+    background: rgba(255, 255, 255, 0.15);
+}
+</style>
+
+<script>
+// Enhanced Table of Contents with active state tracking
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize highlight.js
+    document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+    });
+    
+    const article = document.querySelector('.markdown-body')
+    const toc = document.getElementById('toc')
+    
+    if (!article || !toc) return
+    
+    // Find all headings
+    const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6')
+    if (headings.length === 0) return
+    
+    // Create TOC title
+    const tocTitle = document.createElement('h6')
+    tocTitle.textContent = 'On This Page'
+    toc.appendChild(tocTitle)
+    
+    // Create TOC structure
+    const tocList = document.createElement('ul')
+    toc.appendChild(tocList)
+    
+    // Track heading hierarchy
+    const hierarchy = { ul: tocList, level: 1 }
+    
+    // Create TOC entries
+    headings.forEach((heading, index) => {
+        const level = parseInt(heading.tagName[1])
+        const id = `heading-${index}`
+        heading.id = id
+        
+        // Create TOC item
+        const li = document.createElement('li')
+        const a = document.createElement('a')
+        a.href = `#${id}`
+        a.textContent = heading.textContent
+        a.dataset.target = id
+        li.appendChild(a)
+        
+        // Handle hierarchy
+        if (level > hierarchy.level) {
+            const ul = document.createElement('ul')
+            hierarchy.ul.lastElementChild?.appendChild(ul)
+            hierarchy.ul = ul
+            hierarchy.level = level
+        } else if (level < hierarchy.level) {
+            hierarchy.ul = tocList
+            hierarchy.level = level
+        }
+        
+        hierarchy.ul.appendChild(li)
+    })
+    
+    // Highlight active section while scrolling
+    const tocLinks = toc.getElementsByTagName('a')
+    const headingElements = Array.from(headings)
+    
+    function updateActiveTocLink() {
+        const fromTop = window.scrollY + 100 // Offset for better highlighting
+        
+        let currentHeading = headingElements[0]
+        headingElements.forEach(heading => {
+            if (heading.offsetTop <= fromTop) {
+                currentHeading = heading
+            }
+        })
+        
+        Array.from(tocLinks).forEach(link => {
+            link.classList.remove('active')
+            if (link.dataset.target === currentHeading.id) {
+                link.classList.add('active')
+            }
+        })
+    }
+    
+    // Smooth scroll to section
+    toc.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            e.preventDefault()
+            const targetId = e.target.getAttribute('href').slice(1)
+            const targetElement = document.getElementById(targetId)
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80, // Offset for fixed header
+                    behavior: 'smooth'
+                })
+            }
+        }
+    })
+
+    function updateTag() {
+        const tags = document.querySelectorAll('.doc-tag')
+        tags.forEach(tag => {
+            const tagName = tag.textContent.toLowerCase().replace(/-/g, ' ')
+            tag.textContent = tagName.charAt(0).toUpperCase() + tagName.slice(1)
+        })
+    }
+    
+    // Update active link on scroll
+    window.addEventListener('scroll', updateActiveTocLink)
+    updateActiveTocLink() // Initial update
+    updateTag()
+})
+
+// Copy code function
+function copyCode(button) {
+    const codeBlock = button.closest('.code-block')
+    const code = codeBlock.querySelector('code').textContent
+    
+    navigator.clipboard.writeText(code).then(() => {
+        const icon = button.querySelector('i')
+        icon.className = 'bi bi-check2'
+        setTimeout(() => {
+            icon.className = 'bi bi-clipboard'
+        }, 2000)
+    })
+}
+</script>
+
+<%- include('../partials/footer') %>
