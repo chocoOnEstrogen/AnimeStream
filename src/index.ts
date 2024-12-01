@@ -306,8 +306,7 @@ const server = http.createServer(app)
 
 
 
-// Change the app.listen to server.listen
-server.listen(3000, '0.0.0.0', async () => {
+server.listen(config.port as number, '0.0.0.0', async () => {
 	console.clear()
 	console.log(
 		`${constants.APP_NAME} v${constants.APP_VERSION} is running on ${config.baseUrl}`,
