@@ -143,7 +143,7 @@ app.get('/recent', async (req: Request, res: Response) => {
             ).length,
             totalAnime: allAnime.length,
             activeUsers: Object.values(users).filter(user => 
-                user.lastLogin > Date.now() - (7 * 24 * 60 * 60 * 1000)
+                new Date(user.lastLogin).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000)
             ).length
         };
 

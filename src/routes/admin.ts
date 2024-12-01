@@ -24,7 +24,7 @@ router.get('/', async (req: Request, res: Response) => {
 			totalAnime: anime.length,
 			totalEpisodes: 0,
 			recentUsers: Object.values(users)
-				.sort((a, b) => b.lastLogin - a.lastLogin)
+				.sort((a, b) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime())
 				.slice(0, 5),
 		}
 

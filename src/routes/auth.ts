@@ -56,19 +56,44 @@ router.get('/callback', async (req, res) => {
 		})
 
 		const discordUser = userRes.data
+		const now = new Date().toISOString()
 
-		// Save user to storage
-		const user = {
-			id: discordUser.id,
-			username: discordUser.username,
-			discriminator: discordUser.discriminator,
-			avatar: discordUser.avatar,
-			email: discordUser.email,
-			accessToken: tokens.access_token,
-			refreshToken: tokens.refresh_token,
-			roles: ['user'],
-			createdAt: Date.now(),
-			lastLogin: Date.now(),
+		// Check if user exists
+		let user = await storage.getUser(discordUser.id)
+
+		if (user) {
+			// Update existing user
+			user = {
+				...user,
+				username: discordUser.username,
+				discriminator: discordUser.discriminator,
+				avatar: discordUser.avatar,
+				email: discordUser.email,
+				accessToken: tokens.access_token,
+				refreshToken: tokens.refresh_token,
+				lastLogin: now
+			}
+		} else {
+			// Create new user
+			user = {
+				id: discordUser.id,
+				username: discordUser.username,
+				discriminator: discordUser.discriminator,
+				avatar: discordUser.avatar,
+				email: discordUser.email,
+				accessToken: tokens.access_token,
+				refreshToken: tokens.refresh_token,
+				roles: ['user'],
+				bio: '',
+				settings: {
+					theme: 'dark',
+					autoplay: false,
+					notifications: true
+				},
+				favoriteAnime: [],
+				createdAt: now,
+				lastLogin: now
+			}
 		}
 
 		await storage.saveUser(user)

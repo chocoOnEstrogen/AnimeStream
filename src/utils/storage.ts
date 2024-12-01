@@ -43,8 +43,8 @@ class Storage {
 		  settings: data.settings,
 		  favoriteAnime: data.favorite_anime,
 		  // Convert ISO strings to timestamps if needed by your application
-		  createdAt: new Date(data.created_at).getTime(),
-		  lastLogin: new Date(data.last_login).getTime()
+		  createdAt: data.created_at,
+		  lastLogin: data.last_login
 		}
 	  }
 
@@ -369,8 +369,8 @@ class Storage {
 		  bio: user.bio,
 		  settings: user.settings,
 		  favoriteAnime: user.favorite_anime,
-		  createdAt: new Date(user.created_at).getTime(),
-		  lastLogin: new Date(user.last_login).getTime()
+		  createdAt: user.created_at,
+		  lastLogin: user.last_login
 		}))
 	}
 

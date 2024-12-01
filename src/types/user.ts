@@ -7,15 +7,15 @@ export interface User {
 	accessToken: string
 	refreshToken: string
 	roles: string[]
-	createdAt: number
-	lastLogin: number
+	createdAt: string
+	lastLogin: string
 	bio?: string
 	favoriteAnime?: string[]
 	watchHistory?: {
 		animeId: string
 		season: string
 		episode: string
-		timestamp: number
+		timestamp: string
 		progress: number
 	}[]
 	settings?: {
