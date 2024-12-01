@@ -18,7 +18,7 @@
             <% categories.forEach(category => { %>
                 <div class="nav-group">
                     <h6 class="nav-group-title text-uppercase px-3 py-2">
-                        <%= category %>
+                        <%= category.replace(/-/g, ' ').replace(/_/g, ' ') %>
                     </h6>
                     <div class="nav-group-items">
                         <% docs
@@ -32,7 +32,7 @@
                                         <i class="bi bi-<%= doc.metadata.icon %>"></i>
                                     <% } %>
                                 </span>
-                                <span class="nav-link-title"><%= doc.title %></span>
+                                <span class="nav-link-title"><%= doc.title.replace(/-/g, ' ').replace(/_/g, ' ') %></span>
                             </a>
                         <% }) %>
                     </div>

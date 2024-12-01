@@ -13,13 +13,13 @@
                     <div class="col">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title text-capitalize"><%= category %></h5>
+                                <h5 class="card-title text-capitalize"><%= category.replace(/-/g, ' ').replace(/_/g, ' ') %></h5>
                                 <ul class="list-unstyled mb-0">
                                     <% docs.filter(doc => doc.category === category).forEach(doc => { %>
                                         <li class="mb-2">
                                             <a href="/docs/<%= doc.category %>/<%= doc.slug %>" 
                                                class="text-decoration-none">
-                                                <%= doc.title %>
+                                                <%= doc.title.replace(/-/g, ' ').replace(/_/g, ' ') %>
                                             </a>
                                         </li>
                                     <% }) %>
