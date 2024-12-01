@@ -10,6 +10,10 @@ const requiredEnvVars = [
 	'DISCORD_CLIENT_SECRET',
 	'SESSION_SECRET',
 	'BASE_URL',
+	'DISCORD_BOT_TOKEN',
+	'SUPABASE_ANON_KEY',
+	'SUPABASE_URL',
+	'SUPABASE_SERVICE_ROLE',
 ]
 
 for (const envVar of requiredEnvVars) {

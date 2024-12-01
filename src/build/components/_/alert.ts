@@ -1,10 +1,10 @@
-import DocComponent, { ComponentMetadata } from '../../../classes/DocComponent';
+import DocComponent, { ComponentMetadata } from '../../../classes/DocComponent'
 
 interface AlertProps {
-    type?: 'info' | 'warning' | 'danger';
-    title?: string;
-    icon?: string;
-    children: string;
+	type?: 'info' | 'warning' | 'danger'
+	title?: string
+	icon?: string
+	children: string
 }
 
 const alertStyles = `
@@ -87,51 +87,60 @@ const alertStyles = `
 .doc-alert-content a:hover {
     text-decoration-style: solid;
 }
-`;
+`
 
 export default class Alert extends DocComponent<AlertProps> {
-    static metadata: ComponentMetadata = {
-        name: 'alert',
-        description: 'Alert component',
-        category: 'general',
-        version: '1.0.0'
-    };
+	static metadata: ComponentMetadata = {
+		name: 'alert',
+		description: 'Alert component',
+		category: 'general',
+		version: '1.0.0',
+	}
 
-    constructor() {
-        super('alert', alertStyles);
-    }
+	constructor() {
+		super('alert', alertStyles)
+	}
 
-    protected validateProps(props: AlertProps): boolean {
-        if (!props.children) return false;
-        if (props.type && !['info', 'warning', 'danger'].includes(props.type)) return false;
-        return true;
-    }
+	protected validateProps(props: AlertProps): boolean {
+		if (!props.children) return false
+		if (props.type && !['info', 'warning', 'danger'].includes(props.type))
+			return false
+		return true
+	}
 
-    public render(props: AlertProps): string {
-        const type = props.type || 'info';
-        const icon = props.icon || this.getDefaultIcon(type);
-        
-        return `
+	public render(props: AlertProps): string {
+		const type = props.type || 'info'
+		const icon = props.icon || this.getDefaultIcon(type)
+
+		return `
             <div class="doc-alert doc-alert-${type} d-flex" role="alert">
-                ${icon ? `
+                ${
+									icon ?
+										`
                     <div class="doc-alert-icon me-3">
                         <i class="bi ${icon}"></i>
                     </div>
-                ` : ''}
+                `
+									:	''
+								}
                 <div class="doc-alert-content">
                     ${props.title ? `<div class="doc-alert-title">${this.escape(props.title)}</div>` : ''}
                     ${props.children}
                 </div>
             </div>
-        `.trim();
-    }
+        `.trim()
+	}
 
-    private getDefaultIcon(type: string): string {
-        switch (type) {
-            case 'info': return 'bi-info-circle';
-            case 'warning': return 'bi-exclamation-triangle';
-            case 'danger': return 'bi-exclamation-octagon';
-            default: return 'bi-info-circle';
-        }
-    }
+	private getDefaultIcon(type: string): string {
+		switch (type) {
+			case 'info':
+				return 'bi-info-circle'
+			case 'warning':
+				return 'bi-exclamation-triangle'
+			case 'danger':
+				return 'bi-exclamation-octagon'
+			default:
+				return 'bi-info-circle'
+		}
+	}
 }

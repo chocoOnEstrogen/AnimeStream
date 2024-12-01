@@ -1,9 +1,9 @@
-import DocComponent, { ComponentMetadata } from "../../../classes/DocComponent";
+import DocComponent, { ComponentMetadata } from '../../../classes/DocComponent'
 
 interface CardProps {
-    title: string;
-    icon?: string;
-    children: string;
+	title: string
+	icon?: string
+	children: string
 }
 
 const cardStyles = `
@@ -36,26 +36,26 @@ const cardStyles = `
 .doc-card-content {
     color: var(--bs-secondary-color);
 }
-`;
+`
 
 export default class Card extends DocComponent<CardProps> {
-    static metadata: ComponentMetadata = {
-        name: 'card',
-        description: 'Card component',
-        category: 'general',
-        version: '1.0.0'
-    };
+	static metadata: ComponentMetadata = {
+		name: 'card',
+		description: 'Card component',
+		category: 'general',
+		version: '1.0.0',
+	}
 
-    constructor() {
-        super('card', cardStyles);
-    }
+	constructor() {
+		super('card', cardStyles)
+	}
 
-    protected validateProps(props: CardProps): boolean {
-        return !!props.title && !!props.children;
-    }
+	protected validateProps(props: CardProps): boolean {
+		return !!props.title && !!props.children
+	}
 
-    public render(props: CardProps): string {
-        return `
+	public render(props: CardProps): string {
+		return `
             <div class="doc-card">
                 <div class="doc-card-title">
                     ${props.icon ? `<i class="bi ${props.icon} doc-card-icon"></i>` : ''}
@@ -65,6 +65,6 @@ export default class Card extends DocComponent<CardProps> {
                     ${props.children}
                 </div>
             </div>
-        `;
-    }
-} 
+        `
+	}
+}

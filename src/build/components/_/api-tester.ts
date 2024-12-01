@@ -1,21 +1,24 @@
-import DocComponent, { ComponentProps, ComponentMetadata } from "../../../classes/DocComponent";
+import DocComponent, {
+	ComponentProps,
+	ComponentMetadata,
+} from '../../../classes/DocComponent'
 
 interface ApiTesterProps extends ComponentProps {
-    endpoint: string;
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    description?: string;
-    params?: {
-        name: string;
-        type: 'query' | 'path' | 'body';
-        required?: boolean;
-        description?: string;
-        default?: string;
-    }[];
-    responses?: {
-        status: number;
-        description: string;
-        example: string;
-    }[];
+	endpoint: string
+	method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+	description?: string
+	params?: {
+		name: string
+		type: 'query' | 'path' | 'body'
+		required?: boolean
+		description?: string
+		default?: string
+	}[]
+	responses?: {
+		status: number
+		description: string
+		example: string
+	}[]
 }
 
 const apiTesterStyles = `
@@ -191,67 +194,73 @@ const apiTesterStyles = `
 .doc-api-example-status-5xx {
     color: var(--bs-danger);
 }
-`;
+`
 
 export default class ApiTester extends DocComponent<ApiTesterProps> {
-    static metadata: ComponentMetadata = {
-        name: 'api-tester',
-        description: 'Interactive API testing component',
-        category: 'interactive',
-        version: '1.0.0'
-    };
+	static metadata: ComponentMetadata = {
+		name: 'api-tester',
+		description: 'Interactive API testing component',
+		category: 'interactive',
+		version: '1.0.0',
+	}
 
-    constructor() {
-        super('api-tester', apiTesterStyles);
-    }
+	constructor() {
+		super('api-tester', apiTesterStyles)
+	}
 
-    protected validateProps(props: ApiTesterProps | string | { children: string }): boolean {
-        let parsedProps: ApiTesterProps;
-        
-        if (typeof props === 'string' || 'children' in props) {
-            try {
-                const propsString = typeof props === 'string' ? props : props.children;
-                const match = propsString.match(/{[\s\S]*}/);
-                if (match) {
-                    const jsonStr = match[0]
-                        .replace(/&quot;/g, '"')
-                        .replace(/&amp;/g, '&')
-                        .replace(/&lt;/g, '<')
-                        .replace(/&gt;/g, '>')
-                        .replace(/<\/?p>/g, '')
-                        .trim();
-                    parsedProps = JSON.parse(jsonStr);
-                } else {
-                    parsedProps = JSON.parse(propsString);
-                }
-            } catch (error) {
-                console.error('Failed to parse API tester props:', error);
-                return false;
-            }
-        } else {
-            parsedProps = props as ApiTesterProps;
-        }
+	protected validateProps(
+		props: ApiTesterProps | string | { children: string },
+	): boolean {
+		let parsedProps: ApiTesterProps
 
-        return !!parsedProps.endpoint;
-    }
+		if (typeof props === 'string' || 'children' in props) {
+			try {
+				const propsString = typeof props === 'string' ? props : props.children
+				const match = propsString.match(/{[\s\S]*}/)
+				if (match) {
+					const jsonStr = match[0]
+						.replace(/&quot;/g, '"')
+						.replace(/&amp;/g, '&')
+						.replace(/&lt;/g, '<')
+						.replace(/&gt;/g, '>')
+						.replace(/<\/?p>/g, '')
+						.trim()
+					parsedProps = JSON.parse(jsonStr)
+				} else {
+					parsedProps = JSON.parse(propsString)
+				}
+			} catch (error) {
+				console.error('Failed to parse API tester props:', error)
+				return false
+			}
+		} else {
+			parsedProps = props as ApiTesterProps
+		}
 
-    public render(props: ApiTesterProps | string | { children: string }): string {
-        const parsedProps = this.parseProps(props);
-        const method = parsedProps.method || 'GET';
-        const testerId = `api_tester_${Math.random().toString(36).substring(2, 11)}`;
+		return !!parsedProps.endpoint
+	}
 
-        return `
+	public render(props: ApiTesterProps | string | { children: string }): string {
+		const parsedProps = this.parseProps(props)
+		const method = parsedProps.method || 'GET'
+		const testerId = `api_tester_${Math.random().toString(36).substring(2, 11)}`
+
+		return `
             <div class="doc-api-tester" id="${testerId}">
                 <div class="doc-api-header">
                     <span class="doc-api-method doc-api-method-${method.toLowerCase()}">${method}</span>
                     <code class="doc-api-endpoint">${parsedProps.endpoint}</code>
                 </div>
 
-                ${parsedProps.description ? `
+                ${
+									parsedProps.description ?
+										`
                     <div class="doc-api-description">
                         ${parsedProps.description}
                     </div>
-                ` : ''}
+                `
+									:	''
+								}
 
                 ${this.renderParams(parsedProps.params)}
 
@@ -355,32 +364,37 @@ export default class ApiTester extends DocComponent<ApiTesterProps> {
                     });
             }
             </script>
-        `;
-    }
+        `
+	}
 
-    private renderParams(params?: ApiTesterProps['params']): string {
-        if (!params || params.length === 0) return '';
+	private renderParams(params?: ApiTesterProps['params']): string {
+		if (!params || params.length === 0) return ''
 
-        const queryParams = params.filter(p => p.type === 'query');
-        const pathParams = params.filter(p => p.type === 'path');
-        const bodyParams = params.filter(p => p.type === 'body');
+		const queryParams = params.filter((p) => p.type === 'query')
+		const pathParams = params.filter((p) => p.type === 'path')
+		const bodyParams = params.filter((p) => p.type === 'body')
 
-        return `
+		return `
             <div class="doc-api-params">
                 ${this.renderParamGroup('Path Parameters', pathParams)}
                 ${this.renderParamGroup('Query Parameters', queryParams)}
                 ${this.renderParamGroup('Body Parameters', bodyParams)}
             </div>
-        `;
-    }
+        `
+	}
 
-    private renderParamGroup(title: string, params: ApiTesterProps['params']): string {
-        if (!params || params.length === 0) return '';
+	private renderParamGroup(
+		title: string,
+		params: ApiTesterProps['params'],
+	): string {
+		if (!params || params.length === 0) return ''
 
-        return `
+		return `
             <div class="doc-api-param-group">
                 <div class="doc-api-param-title">${title}</div>
-                ${params.map(param => `
+                ${params
+									.map(
+										(param) => `
                     <div class="doc-api-param">
                         <input type="text" 
                                name="${param.name}"
@@ -393,27 +407,33 @@ export default class ApiTester extends DocComponent<ApiTesterProps> {
                             ${param.description ? `<div class="doc-api-param-description">${param.description}</div>` : ''}
                         </div>
                     </div>
-                `).join('')}
+                `,
+									)
+									.join('')}
             </div>
-        `;
-    }
+        `
+	}
 
-    private renderExamples(responses?: ApiTesterProps['responses']): string {
-        if (!responses || responses.length === 0) return '';
+	private renderExamples(responses?: ApiTesterProps['responses']): string {
+		if (!responses || responses.length === 0) return ''
 
-        return `
+		return `
             <div class="doc-api-examples">
                 <h6>Example Responses</h6>
-                ${responses.map(response => `
+                ${responses
+									.map(
+										(response) => `
                     <div class="doc-api-example">
-                        <div class="doc-api-example-status doc-api-example-status-${Math.floor(response.status/100)}xx">
+                        <div class="doc-api-example-status doc-api-example-status-${Math.floor(response.status / 100)}xx">
                             <i class="bi ${response.status < 400 ? 'bi-check-circle' : 'bi-x-circle'}"></i>
                             ${response.status} - ${response.description}
                         </div>
                         <pre><code class="language-json">${this.escape(JSON.stringify(response.example, null, 2))}</code></pre>
                     </div>
-                `).join('')}
+                `,
+									)
+									.join('')}
             </div>
-        `;
-    }
-} 
+        `
+	}
+}

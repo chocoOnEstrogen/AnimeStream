@@ -1,9 +1,9 @@
-import DocComponent, { ComponentMetadata } from "../../../classes/DocComponent";
+import DocComponent, { ComponentMetadata } from '../../../classes/DocComponent'
 
 interface CalloutProps {
-    type?: 'note' | 'tip' | 'important' | 'caution';
-    title?: string;
-    children: string;
+	type?: 'note' | 'tip' | 'important' | 'caution'
+	title?: string
+	children: string
 }
 
 const calloutStyles = `
@@ -41,52 +41,65 @@ const calloutStyles = `
     background: rgba(var(--bs-danger-rgb), 0.05);
     border-color: var(--bs-danger);
 }
-`;
+`
 
 export default class Callout extends DocComponent<CalloutProps> {
-    static metadata: ComponentMetadata = {
-        name: 'callout',
-        description: 'Callout component',
-        category: 'general',
-        version: '1.0.0'
-    };
+	static metadata: ComponentMetadata = {
+		name: 'callout',
+		description: 'Callout component',
+		category: 'general',
+		version: '1.0.0',
+	}
 
-    constructor() {
-        super('callout', calloutStyles);
-    }
+	constructor() {
+		super('callout', calloutStyles)
+	}
 
-    protected validateProps(props: CalloutProps): boolean {
-        if (!props.children) return false;
-        if (props.type && !['note', 'tip', 'important', 'caution'].includes(props.type)) return false;
-        return true;
-    }
+	protected validateProps(props: CalloutProps): boolean {
+		if (!props.children) return false
+		if (
+			props.type &&
+			!['note', 'tip', 'important', 'caution'].includes(props.type)
+		)
+			return false
+		return true
+	}
 
-    public render(props: CalloutProps): string {
-        const type = props.type || 'note';
-        const icon = this.getIcon(type);
-        
-        return `
+	public render(props: CalloutProps): string {
+		const type = props.type || 'note'
+		const icon = this.getIcon(type)
+
+		return `
             <div class="doc-callout doc-callout-${type}">
-                ${props.title ? `
+                ${
+									props.title ?
+										`
                     <div class="doc-callout-title">
                         <i class="bi ${icon}"></i>
                         ${this.escape(props.title)}
                     </div>
-                ` : ''}
+                `
+									:	''
+								}
                 <div class="doc-callout-content">
                     ${props.children}
                 </div>
             </div>
-        `;
-    }
+        `
+	}
 
-    private getIcon(type: string): string {
-        switch (type) {
-            case 'note': return 'bi-info-circle';
-            case 'tip': return 'bi-lightbulb';
-            case 'important': return 'bi-exclamation-circle';
-            case 'caution': return 'bi-exclamation-triangle';
-            default: return 'bi-info-circle';
-        }
-    }
-} 
+	private getIcon(type: string): string {
+		switch (type) {
+			case 'note':
+				return 'bi-info-circle'
+			case 'tip':
+				return 'bi-lightbulb'
+			case 'important':
+				return 'bi-exclamation-circle'
+			case 'caution':
+				return 'bi-exclamation-triangle'
+			default:
+				return 'bi-info-circle'
+		}
+	}
+}

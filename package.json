@@ -8,10 +8,11 @@
   },
   "scripts": {
     "format": "prettier --cache --write . --ignore-path .prettierignore",
-    "build": "npm run build:docs && tsc && node tools/copy.js",
+    "build": "npm run build:docs && tsc && node tools/copy.js && npm run deploy:commands",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "build:docs": "ts-node src/build/docs.ts"
+    "build:docs": "ts-node src/build/docs.ts",
+    "deploy:commands": "node tools/deployCommands"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,7 @@
     "@supabase/supabase-js": "^2.46.1",
     "axios": "^1.7.8",
     "cors": "^2.8.5",
+    "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",

@@ -70,13 +70,10 @@ router.get(
 			const prevEpisode =
 				episodeIndex > 0 ? `/watch/${animeId}/${season}/${episodeIndex}` : null
 
-			let isFavorite;
+			let isFavorite
 
 			if ((req as any).user) {
-				isFavorite = await storage.isFavorite(
-					(req as any).user.id,
-					animeId,
-				)
+				isFavorite = await storage.isFavorite((req as any).user.id, animeId)
 			}
 
 			render(req, res, 'watch', {

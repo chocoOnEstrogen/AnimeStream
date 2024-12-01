@@ -71,7 +71,7 @@ router.get('/callback', async (req, res) => {
 				email: discordUser.email,
 				accessToken: tokens.access_token,
 				refreshToken: tokens.refresh_token,
-				lastLogin: now
+				lastLogin: now,
 			}
 		} else {
 			// Create new user
@@ -88,11 +88,11 @@ router.get('/callback', async (req, res) => {
 				settings: {
 					theme: 'dark',
 					autoplay: false,
-					notifications: true
+					notifications: true,
 				},
 				favoriteAnime: [],
 				createdAt: now,
-				lastLogin: now
+				lastLogin: now,
 			}
 		}
 

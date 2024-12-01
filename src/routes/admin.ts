@@ -6,7 +6,6 @@ import * as media from '../utils/media'
 import { config } from '../config'
 import * as malScraper from 'mal-scraper'
 
-
 const router = express.Router()
 
 // Protect all admin routes
@@ -24,7 +23,10 @@ router.get('/', async (req: Request, res: Response) => {
 			totalAnime: anime.length,
 			totalEpisodes: 0,
 			recentUsers: Object.values(users)
-				.sort((a, b) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime())
+				.sort(
+					(a, b) =>
+						new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime(),
+				)
 				.slice(0, 5),
 		}
 
@@ -155,13 +157,13 @@ router.get('/suggestions', async (req: Request, res: Response) => {
 		const suggestions = await storage.getAllSuggestions()
 		render(req, res, 'admin/suggestions', {
 			title: 'Suggestion Management',
-			suggestions
+			suggestions,
 		})
 	} catch (error) {
 		console.error('Suggestion management error:', error)
 		render(req, res, 'error', {
 			title: 'Error',
-			error: 'Failed to load suggestions'
+			error: 'Failed to load suggestions',
 		})
 	}
 })
@@ -171,14 +173,14 @@ router.post('/suggestions/:id/status', async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params
 		const { status, reviewNote } = req.body
-		
+
 		await storage.updateSuggestion(id, {
 			status,
 			reviewNote,
 			reviewedBy: (req as any).user.id,
-			updatedAt: new Date().toISOString()
+			updatedAt: new Date().toISOString(),
 		})
-		
+
 		res.json({ success: true })
 	} catch (error) {
 		console.error('Update suggestion error:', error)
@@ -188,9 +190,10 @@ router.post('/suggestions/:id/status', async (req: Request, res: Response) => {
 
 router.get('/mal/:malId', async (req: Request, res: Response) => {
 	const { malId } = req.params
-	const malData = await malScraper.getInfoFromURL(`https://myanimelist.net/anime/${malId}`)
+	const malData = await malScraper.getInfoFromURL(
+		`https://myanimelist.net/anime/${malId}`,
+	)
 	res.json(malData)
 })
-
 
 export default router
