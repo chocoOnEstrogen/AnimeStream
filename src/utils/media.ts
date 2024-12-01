@@ -225,3 +225,17 @@ export async function getAllGenres(directories: string[]): Promise<string[]> {
 		return [] // Return empty array if error occurs
 	}
 }
+
+export function getEpisodePath(animeId: string, season: string, episode: string) {
+	// Pad the episode number with a leading zero if it's a single digit
+	const paddedEpisode = episode.padStart(2, '0')
+	
+	// Try each media directory until we find the video
+	for (const mediaDir of config.config.media) {
+		const videoPath = path.join(mediaDir, animeId, season, `${paddedEpisode}.mp4`)
+		if (fs.existsSync(videoPath)) {
+			return videoPath
+		}
+	}
+	return null
+}

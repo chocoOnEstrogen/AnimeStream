@@ -88,6 +88,8 @@ router.get(
 				nextEpisode,
 				prevEpisode,
 				isFavorite,
+				user: (req as any).user,
+				animeId,
 			})
 		} catch (error) {
 			console.error('Error loading watch page:', error)

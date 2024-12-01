@@ -1,15 +1,24 @@
 import express, { Request, Response } from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
+import { config } from '../config'
+import * as storage from '../utils/storage'
+import * as media from '../utils/media'
 
 const router = express.Router()
 
 //@ts-ignore
-router.get('/:path(*)', (req: Request, res: Response) => {
-	const videoPath = path.resolve('/', req.params.path)
+router.get('/:animeId/:season/:episode', (req: Request, res: Response) => {
+	// Decode URI components and clean up parameters
+	const animeId = decodeURIComponent(req.params.animeId)
+	const season = decodeURIComponent(req.params.season)
+	const episode = decodeURIComponent(req.params.episode)
 
 	// Ensure the file exists
-	if (!fs.existsSync(videoPath)) {
+	const videoPath = media.getEpisodePath(animeId, season, episode)
+
+	if (!videoPath) {
+		console.log(`Video not found: ${animeId}/${season}/${episode}`)
 		return res.status(404).send('Video not found')
 	}
 
