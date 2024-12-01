@@ -1,0 +1,225 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Introduction Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="h3 mb-3">Suggest Anime</h1>
+                    <p class="text-body-secondary mb-0">
+                        Want to see a specific anime added to our library? Submit your suggestion using a MyAnimeList URL.
+                        I will review your suggestion and consider adding it to the collection.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Suggestion Form -->
+            <div class="card">
+                <div class="card-body">
+                    <form id="suggestionForm" class="needs-validation" novalidate>
+                        <!-- MAL URL Input -->
+                        <div class="mb-3">
+                            <label for="malUrl" class="form-label">MyAnimeList URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+                                <input type="url" 
+                                       class="form-control" 
+                                       id="malUrl" 
+                                       name="malUrl"
+                                       placeholder="https://myanimelist.net/anime/..."
+                                       pattern="https?://myanimelist\.net/anime/\d+.*"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid MyAnimeList URL
+                                </div>
+                            </div>
+                            <div class="form-text">Example: https://myanimelist.net/anime/1535/Death_Note</div>
+                        </div>
+
+                        <!-- Priority Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Priority</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="priority" id="low" value="low" checked>
+                                <label class="btn btn-outline-secondary" for="low">Low</label>
+
+                                <input type="radio" class="btn-check" name="priority" id="medium" value="medium">
+                                <label class="btn btn-outline-secondary" for="medium">Medium</label>
+
+                                <input type="radio" class="btn-check" name="priority" id="high" value="high">
+                                <label class="btn btn-outline-secondary" for="high">High</label>
+                            </div>
+                        </div>
+
+                        <!-- Comment -->
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comment (Optional)</label>
+                            <textarea class="form-control" 
+                                      id="comment" 
+                                      name="comment"
+                                      rows="3"
+                                      placeholder="Why should we add this anime?"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Submit Suggestion
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Suggestions -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">My Suggestions</h5>
+                </div>
+                <div class="list-group list-group-flush" id="mySuggestions">
+                    <!-- Suggestions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Suggestion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3" id="previewImage"></div>
+                <h5 id="previewTitle" class="mb-2"></h5>
+                <p id="previewSynopsis" class="small text-body-secondary"></p>
+                <div class="d-flex gap-2 mb-2">
+                    <span class="badge bg-primary" id="previewType"></span>
+                    <span class="badge bg-secondary" id="previewStatus"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmSuggestion">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('suggestionForm');
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    let animeData = null;
+
+    // Load existing suggestions
+    loadMySuggestions();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const malUrl = document.getElementById('malUrl').value;
+        
+        try {
+            // Fetch anime data for preview
+            const response = await fetch(`/suggest/api/anime/preview?url=${encodeURIComponent(malUrl)}`);
+            if (!response.ok) throw new Error('Failed to fetch anime data');
+            
+            animeData = await response.json();
+            
+            // Update preview modal
+            document.getElementById('previewImage').innerHTML = `
+                <img src="${animeData.image}" alt="${animeData.title}" class="img-fluid rounded">
+            `;
+            document.getElementById('previewTitle').textContent = animeData.title;
+            document.getElementById('previewSynopsis').textContent = animeData.synopsis;
+            document.getElementById('previewType').textContent = animeData.type;
+            document.getElementById('previewStatus').textContent = animeData.status;
+            
+            modal.show();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to fetch anime data. Please check the URL and try again.');
+        }
+    });
+
+    document.getElementById('confirmSuggestion').addEventListener('click', async () => {
+        const formData = new FormData(form);
+        const data = {
+            ...animeData,
+            priority: formData.get('priority'),
+            comment: formData.get('comment')
+        };
+
+        try {
+            const response = await fetch('/suggest/api/suggestions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) throw new Error('Failed to submit suggestion');
+
+            modal.hide();
+            form.reset();
+            form.classList.remove('was-validated');
+            await loadMySuggestions();
+            
+            alert('Suggestion submitted successfully!');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to submit suggestion. Please try again.');
+        }
+    });
+
+    async function loadMySuggestions() {
+        try {
+            const response = await fetch('/suggest/api/suggestions/mine');
+            if (!response.ok) throw new Error('Failed to load suggestions');
+            
+            const suggestions = await response.json();
+            const container = document.getElementById('mySuggestions');
+            
+            container.innerHTML = suggestions.length ? suggestions.map(s => `
+                <div class="list-group-item">
+                    <div class="d-flex gap-3">
+                        <img src="${s.image}" alt="${s.title}" style="width: 64px; height: 90px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">${s.title}</h6>
+                            <p class="mb-1 small text-body-secondary">${s.synopsis.substring(0, 100)}...</p>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge bg-${s.status === 'pending' ? 'warning' : 
+                                                      s.status === 'approved' ? 'success' : 
+                                                      s.status === 'rejected' ? 'danger' : 'secondary'}">
+                                    ${s.status}
+                                </span>
+                                <small class="text-body-secondary">
+                                    Suggested on ${new Date(s.createdAt).toLocaleDateString()}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : `
+                <div class="list-group-item text-center text-body-secondary py-4">
+                    <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                    No suggestions yet
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+});
+</script>
+
+<%- include('partials/footer') %> 

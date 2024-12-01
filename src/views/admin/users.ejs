@@ -1,0 +1,84 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">User Management</h1>
+        <a href="/admin" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" 
+                                         alt="Avatar"
+                                         class="rounded-circle me-2"
+                                         width="32"
+                                         height="32">
+                                    <%= user.username %>
+                                </div>
+                            </td>
+                            <td><%= user.email || 'N/A' %></td>
+                            <td>
+                                <select class="form-select form-select-sm" 
+                                        multiple
+                                        onchange="updateRoles('<%= user.id %>', this.value)">
+                                    <option value="user" <%= user.roles.includes('user') ? 'selected' : '' %>>User</option>
+                                    <option value="admin" <%= user.roles.includes('admin') ? 'selected' : '' %>>Admin</option>
+                                </select>
+                            </td>
+                            <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/users/profile/<%= user.id %>" 
+                                       class="btn btn-outline-primary">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+async function updateRoles(userId, roles) {
+    try {
+        const res = await fetch(`/admin/users/${userId}/roles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ roles })
+        });
+        
+        if (!res.ok) throw new Error('Failed to update roles');
+        
+        // Show success message
+        alert('Roles updated successfully');
+    } catch (error) {
+        console.error('Error updating roles:', error);
+        alert('Failed to update roles');
+    }
+}
+</script>
+
+<%- include('../partials/footer') %> 

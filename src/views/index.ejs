@@ -1,0 +1,129 @@
+<%- include('partials/header') %>
+
+<!-- Hero Section -->
+<div class="hero-section position-relative overflow-hidden text-center bg-dark text-white py-5">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold mb-4"><%= constants.APP_NAME %></h1>
+        <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+            Your personal anime streaming platform. Watch your favorite series anytime, 
+            track your progress, and discover new shows - all in one place.
+        </p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
+            <% if (!isAuthenticated) { %>
+                <a href="/auth/login" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-discord me-2"></i>Get Started
+                </a>
+                <a href="/browse" class="btn btn-outline-light btn-lg px-4">Browse Library</a>
+            <% } else { %>
+                <a href="/browse" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-collection-play me-2"></i>Browse Library
+                </a>
+                <a href="/users/profile" class="btn btn-outline-light btn-lg px-4">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="row g-4 py-4 row-cols-1 row-cols-md-2 row-cols-lg-3">
+        <!-- Feature 1 -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-collection-play display-5 text-primary"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Organized Library</h3>
+                    <p class="text-body-secondary">
+                        Keep your anime collection neatly organized with automatic metadata fetching and easy browsing.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-clock-history display-5 text-primary"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Progress Tracking</h3>
+                    <p class="text-body-secondary">
+                        Never lose your place again. We automatically track your watching progress across all series.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-heart display-5 text-primary"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Favorites</h3>
+                    <p class="text-body-secondary">
+                        Keep track of your favorite shows and access them quickly from your profile.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Additions -->
+<div class="bg-body-tertiary py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Recent Additions</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+            <% recentAnime.slice(0, 6).forEach(function(anime) { %>
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="/media/cover/<%= anime.id %>" 
+                             class="card-img-top" 
+                             alt="<%= anime.title %>"
+                             style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate"><%= anime.title %></h6>
+                            <p class="card-text">
+                                <small class="text-body-secondary"><%= anime.type %></small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <div class="text-center mt-4">
+            <a href="/browse" class="btn btn-outline-primary">View All</a>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom styles -->
+<style>
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('/images/hero-bg.jpg') center/cover;
+}
+
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+
+<%- include('partials/footer') %>

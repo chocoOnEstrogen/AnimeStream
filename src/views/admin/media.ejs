@@ -1,0 +1,182 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Media Management</h1>
+        <div class="btn-group">
+            <button onclick="scanMedia()" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise"></i> Scan Media
+            </button>
+            <a href="/admin" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Media List -->
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Anime Library</h5>
+                <div class="input-group w-auto">
+                    <input type="text" 
+                           class="form-control" 
+                           placeholder="Search..." 
+                           id="searchInput"
+                           onkeyup="filterMedia(this.value)">
+                    <button class="btn btn-outline-secondary dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown">
+                        Filter
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="filterByType('TV')">TV Series</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterByType('Movie')">Movies</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterByType('OVA')">OVAs</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterByType('')">Show All</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Seasons</th>
+                        <th>Episodes</th>
+                        <th>Added</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="mediaTable">
+                    <% anime.forEach(item => { %>
+                        <tr data-type="<%= item.type %>" data-title="<%= item.title.toLowerCase() %>">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <% if (item.coverPath) { %>
+                                        <img src="/media/cover/<%= item.id %>" 
+                                             alt="Cover"
+                                             class="rounded me-2"
+                                             width="48"
+                                             height="48"
+                                             style="object-fit: cover;">
+                                    <% } %>
+                                    <div>
+                                        <h6 class="mb-0"><%= item.title %></h6>
+                                        <small class="text-body-secondary">
+                                            <%= item.genre.join(', ') %>
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><%= item.type %></td>
+                            <td><%= Object.keys(item.seasons).length %></td>
+                            <td><%= Object.values(item.seasons).flat().length %></td>
+                            <td><%= new Date(item.dateAdded).toLocaleDateString() %></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/details/<%= item.id %>" 
+                                       class="btn btn-outline-primary"
+                                       target="_blank">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <button onclick="refreshMetadata('<%= item.id %>')" 
+                                            class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                    <button onclick="deleteMedia('<%= item.id %>')" 
+                                            class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filter media by search term
+function filterMedia(search) {
+    const rows = document.querySelectorAll('#mediaTable tr');
+    const term = search.toLowerCase();
+    
+    rows.forEach(row => {
+        const title = row.dataset.title;
+        const type = row.dataset.type;
+        const isVisible = title.includes(term) && 
+            (!currentTypeFilter || type === currentTypeFilter);
+        row.style.display = isVisible ? '' : 'none';
+    });
+}
+
+// Filter by type
+let currentTypeFilter = '';
+function filterByType(type) {
+    currentTypeFilter = type;
+    const search = document.getElementById('searchInput').value;
+    filterMedia(search);
+}
+
+// Scan media directories
+async function scanMedia() {
+    try {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Scanning...';
+
+        const res = await fetch('/admin/media/scan', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to scan media');
+
+        // Reload page to show updated media
+        location.reload();
+    } catch (error) {
+        console.error('Error scanning media:', error);
+        alert('Failed to scan media directories');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// Refresh metadata for a specific anime
+async function refreshMetadata(animeId) {
+    try {
+        const res = await fetch(`/admin/media/${animeId}/refresh`, { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to refresh metadata');
+        
+        // Show success message
+        alert('Metadata refreshed successfully');
+    } catch (error) {
+        console.error('Error refreshing metadata:', error);
+        alert('Failed to refresh metadata');
+    }
+}
+
+// Delete media entry
+async function deleteMedia(animeId) {
+    if (!confirm('Are you sure you want to delete this media entry? This will not delete the actual files.')) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`/admin/media/${animeId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete media');
+        
+        // Remove row from table
+        const row = document.querySelector(`tr[data-anime-id="${animeId}"]`);
+        row?.remove();
+    } catch (error) {
+        console.error('Error deleting media:', error);
+        alert('Failed to delete media entry');
+    }
+}
+</script>
+
+<%- include('../partials/footer') %> 

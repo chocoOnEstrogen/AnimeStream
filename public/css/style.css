@@ -1,0 +1,27 @@
+/* Card hover effect */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Ensure consistent card image heights */
+.card-img-top {
+    height: 300px;
+    object-fit: cover;
+}
+
+/* Truncate long descriptions */
+.card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Genre tags */
+.text-body-secondary {
+    font-size: 0.875rem;
+} 

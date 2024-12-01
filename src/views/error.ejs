@@ -1,0 +1,43 @@
+<%- include('partials/header') %>
+
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="error-container">
+                <h1 class="display-1 text-danger mb-4">
+                    <% if (typeof statusCode !== 'undefined') { %>
+                        <%= statusCode %>
+                    <% } else { %>
+                        Oops!
+                    <% } %>
+                </h1>
+                
+                <div class="mb-4">
+                    <% if (typeof error === 'string') { %>
+                        <h2 class="h4 mb-3"><%= error %></h2>
+                    <% } else { %>
+                        <h2 class="h4 mb-3">Something went wrong</h2>
+                    <% } %>
+                    
+                    <p class="text-body-secondary">
+                        Don't worry, you can try one of these instead:
+                    </p>
+                </div>
+
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <button onclick="history.back()" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i> Go Back
+                    </button>
+                    <a href="/" class="btn btn-primary">
+                        <i class="bi bi-house"></i> Home Page
+                    </a>
+                    <a href="/browse" class="btn btn-outline-primary">
+                        <i class="bi bi-collection"></i> Browse Anime
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %> 

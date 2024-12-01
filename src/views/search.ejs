@@ -1,0 +1,125 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <!-- Search Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <% if (query) { %>
+                Search Results for "<%= query %>"
+            <% } else { %>
+                Browse Anime
+            <% } %>
+        </h1>
+        
+        <!-- View Toggle -->
+        <div class="btn-group">
+            <button class="btn btn-outline-primary active" data-view="grid">
+                <i class="bi bi-grid-3x3"></i>
+            </button>
+            <button class="btn btn-outline-primary" data-view="list">
+                <i class="bi bi-list-ul"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filters</h5>
+                    
+                    <!-- Sort -->
+                    <div class="mb-4">
+                        <label class="form-label">Sort By</label>
+                        <select class="form-select" id="sort">
+                            <option value="title-asc">Title (A-Z)</option>
+                            <option value="title-desc">Title (Z-A)</option>
+                            <option value="recent">Recently Added</option>
+                        </select>
+                    </div>
+
+                    <!-- Type Filter -->
+                    <div class="mb-4">
+                        <label class="form-label">Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="TV" id="typeTV">
+                            <label class="form-check-label" for="typeTV">TV Series</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Movie" id="typeMovie">
+                            <label class="form-check-label" for="typeMovie">Movie</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="OVA" id="typeOVA">
+                            <label class="form-check-label" for="typeOVA">OVA</label>
+                        </div>
+                    </div>
+
+                    <!-- Genre Filter -->
+                    <div class="mb-4">
+                        <label class="form-label">Genres</label>
+                        <div class="genre-list" style="max-height: 200px; overflow-y: auto;">
+                            <% genres.forEach(genre => { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           value="<%= genre %>" 
+                                           id="genre<%= genre.replace(/\s+/g, '') %>">
+                                    <label class="form-check-label" 
+                                           for="genre<%= genre.replace(/\s+/g, '') %>">
+                                        <%= genre %>
+                                    </label>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <button class="btn btn-outline-secondary w-100" id="clearFilters">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="col-lg-9">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" id="animeGrid">
+                <% animeList.forEach(anime => { %>
+                    <div class="col anime-card" 
+                         data-type="<%= anime.type %>"
+                         data-genres="<%= anime.genre.join(',') %>">
+                        <div class="card h-100">
+                            <img src="/media/cover/<%= anime.id %>" 
+                                 class="card-img-top" 
+                                 alt="<%= anime.title %>"
+                                 onerror="this.src='/images/no-cover.jpg'">
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">
+                                    <%= anime.title %>
+                                </h5>
+                                <p class="card-text small text-body-secondary mb-2">
+                                    <%= anime.type %> • <%= anime.genre.join(', ') %>
+                                </p>
+                                <p class="card-text small text-truncate">
+                                    <%= anime.description %>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="/details/<%= anime.id %>" class="btn btn-primary w-100">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this before the footer -->
+<script src="/js/search.js"></script>
+
+<%- include('partials/footer') %> 

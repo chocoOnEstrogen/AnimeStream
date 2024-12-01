@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <h1 class="mb-4">Browse Anime</h1>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <% animeList.forEach(function(anime) { %>
+            <div class="col">
+                <div class="card h-100">
+                    <% if (anime.coverPath) { %>
+                        <img src="/media/cover/<%= anime.id %>" 
+                             class="card-img-top" 
+                             alt="<%= anime.title %> Cover"
+                             data-mal-id="<%= anime.malId %>"
+                             data-media-url="/media/cover/<%= anime.id %>"
+                             style="height: 300px; object-fit: cover;"
+                             onerror="this.onerror=null; this.src='/images/error.png';">
+                    <% } %>
+                    <div class="card-body">
+                        <h5 class="card-title"><%= anime.title %></h5>
+                        <p class="card-text">
+                            <small class="text-body-secondary">
+                                <%= anime.type %> • <%= anime.genre.join(', ') %>
+                            </small>
+                        </p>
+                        <p class="card-text"><%= anime.description %></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-body-secondary">
+                                <%= Object.keys(anime.seasons).length %> Season<%= Object.keys(anime.seasons).length !== 1 ? 's' : '' %>
+                            </small>
+                            <div class="btn-group">
+                                <a href="/watch/<%= anime.id %>" class="btn btn-sm btn-outline-primary">Watch</a>
+                                <a href="/details/<%= anime.id %>" class="btn btn-sm btn-outline-secondary">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<%- include('partials/footer') %> 

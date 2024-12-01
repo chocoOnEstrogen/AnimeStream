@@ -1,0 +1,109 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <% if (anime.bannerPath) { %>
+        <div class="banner-container mb-4">
+            <img src="/media/banner/<%= anime.id %>" 
+                 class="w-100" 
+                 alt="<%= anime.title %> Banner"
+                 style="height: 300px; object-fit: cover;"
+                 onerror="this.onerror=null; this.src='/images/no-banner.jpg';">
+        </div>
+    <% } %>
+
+    <div class="row">
+        <!-- Left Column - Cover and Quick Info -->
+        <div class="col-md-3">
+            <% if (anime.coverPath) { %>
+                <img src="/media/cover/<%= anime.id %>" 
+                     class="img-fluid rounded mb-3" 
+                     alt="<%= anime.title %> Cover"
+                     onerror="this.onerror=null; this.src='/images/no-cover.jpg';">
+            <% } %>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-body-secondary">Information</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Type:</strong> <%= anime.type %></li>
+                        <li><strong>Seasons:</strong> <%= Object.keys(anime.seasons).length %></li>
+                        <% if (malData) { %>
+                            <li><strong>Status:</strong> <%= malData.status %></li>
+                            <li><strong>Aired:</strong> <%= malData.aired %></li>
+                            <li><strong>Score:</strong> <%= malData.score %></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="/watch/<%= anime.id %>" class="btn btn-primary">Start Watching</a>
+                <% if (anime.malId) { %>
+                    <a href="https://myanimelist.net/anime/<%= anime.malId %>" 
+                       target="_blank" 
+                       class="btn btn-outline-secondary">
+                        View on MAL
+                    </a>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Right Column - Details -->
+        <div class="col-md-9">
+            <h1 class="mb-3"><%= anime.title %></h1>
+            
+            <div class="mb-4">
+                <h5>Genres</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <% anime.genre.forEach(function(genre) { %>
+                        <span class="badge bg-secondary"><%= genre %></span>
+                    <% }); %>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5>Synopsis</h5>
+                <p><%= anime.description %></p>
+                <% if (malData && malData.synopsis && malData.synopsis !== anime.description) { %>
+                    <p class="text-body-secondary"><small>MAL Synopsis:</small></p>
+                    <p><%= malData.synopsis %></p>
+                <% } %>
+            </div>
+
+            <div class="mb-4">
+                <h5>Episodes</h5>
+                <div class="accordion" id="seasonsAccordion">
+                    <% Object.entries(anime.seasons).forEach(function([seasonName, episodes], index) { %>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button <%= index === 0 ? '' : 'collapsed' %>" 
+                                        type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#season<%= index %>">
+                                    <%= seasonName %> (<%= episodes.length %> episodes)
+                                </button>
+                            </h2>
+                            <div id="season<%= index %>" 
+                                 class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>"
+                                 data-bs-parent="#seasonsAccordion">
+                                <div class="accordion-body">
+                                    <div class="list-group">
+                                        <% episodes.forEach(function(episode, epIndex) { %>
+                                            <a href="/watch/<%= anime.id %>/<%= seasonName %>/<%= epIndex + 1 %>" 
+                                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                                Episode <%= epIndex + 1 %>
+                                                <span class="badge bg-primary rounded-pill">Watch</span>
+                                            </a>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %> 

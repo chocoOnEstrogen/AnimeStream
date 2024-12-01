@@ -1,0 +1,195 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Recent Activity</h1>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary active" data-filter="all">
+                All
+            </button>
+            <button class="btn btn-outline-primary" data-filter="added">
+                Added
+            </button>
+            <button class="btn btn-outline-primary" data-filter="updated">
+                Updated
+            </button>
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Recent Anime -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recently Added</h5>
+                    <a href="/browse" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="list-group list-group-flush" id="recentAnime">
+                    <% recentAnime.forEach(function(anime) { %>
+                        <div class="list-group-item" data-type="added">
+                            <div class="d-flex gap-3">
+                                <img src="/media/cover/<%= anime.id %>" 
+                                     alt="<%= anime.title %>"
+                                     class="rounded"
+                                     style="width: 100px; height: 140px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h5 class="mb-1">
+                                            <a href="/details/<%= anime.id %>" class="text-decoration-none">
+                                                <%= anime.title %>
+                                            </a>
+                                        </h5>
+                                        <small class="text-body-secondary">
+                                            <%= new Date(anime.dateAdded).toLocaleDateString() %>
+                                        </small>
+                                    </div>
+                                    <p class="mb-2 text-body-secondary">
+                                        <%= anime.type %> • <%= anime.genre.join(', ') %>
+                                    </p>
+                                    <p class="mb-0 small text-truncate-2">
+                                        <%= anime.description %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- Recent Updates -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Updates</h5>
+                </div>
+                <div class="list-group list-group-flush" id="recentUpdates">
+                    <% recentUpdates.forEach(function(update) { %>
+                        <div class="list-group-item" data-type="updated">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                                    <i class="bi bi-arrow-clockwise text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="/details/<%= update.animeId %>" class="text-decoration-none">
+                                            <%= update.title %>
+                                        </a>
+                                    </h6>
+                                    <small class="text-body-secondary">
+                                        <%= update.message %>
+                                    </small>
+                                </div>
+                                <small class="text-body-secondary">
+                                    <%= new Date(update.timestamp).toLocaleDateString() %>
+                                </small>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Popular This Week -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Popular This Week</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <% popularAnime.forEach(function(anime, index) { %>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="text-primary fw-bold" style="width: 24px;">
+                                    #<%= index + 1 %>
+                                </div>
+                                <img src="/media/cover/<%= anime.id %>" 
+                                     alt="<%= anime.title %>"
+                                     class="rounded"
+                                     style="width: 45px; height: 65px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-0">
+                                        <a href="/details/<%= anime.id %>" class="text-decoration-none">
+                                            <%= anime.title %>
+                                        </a>
+                                    </h6>
+                                    <small class="text-body-secondary">
+                                        <%= anime.views %> views
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- Activity Stats -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Activity Stats</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>New Anime This Week</span>
+                            <span class="fw-bold"><%= stats.newThisWeek %></span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" style="width: <%= (stats.newThisWeek / stats.totalAnime) * 100 %>%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Active Users</span>
+                            <span class="fw-bold"><%= stats.activeUsers %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.list-group-item {
+    transition: transform 0.2s;
+}
+
+.list-group-item:hover {
+    transform: translateX(5px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter buttons
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active state
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter items
+            const filter = this.dataset.filter;
+            const items = document.querySelectorAll('[data-type]');
+            
+            items.forEach(item => {
+                if (filter === 'all' || item.dataset.type === filter) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+
+<%- include('partials/footer') %> 
