@@ -147,4 +147,41 @@ router.delete('/media/:animeId', async (req: Request, res: Response) => {
 	}
 })
 
+// Suggestions management
+router.get('/suggestions', async (req: Request, res: Response) => {
+	try {
+		const suggestions = await storage.getAllSuggestions()
+		render(req, res, 'admin/suggestions', {
+			title: 'Suggestion Management',
+			suggestions
+		})
+	} catch (error) {
+		console.error('Suggestion management error:', error)
+		render(req, res, 'error', {
+			title: 'Error',
+			error: 'Failed to load suggestions'
+		})
+	}
+})
+
+// Update suggestion status
+router.post('/suggestions/:id/status', async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params
+		const { status, reviewNote } = req.body
+		
+		await storage.updateSuggestion(id, {
+			status,
+			reviewNote,
+			reviewedBy: (req as any).user.id,
+			updatedAt: new Date().toISOString()
+		})
+		
+		res.json({ success: true })
+	} catch (error) {
+		console.error('Update suggestion error:', error)
+		res.status(500).json({ error: 'Failed to update suggestion' })
+	}
+})
+
 export default router
