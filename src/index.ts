@@ -17,11 +17,19 @@ import adminRouter from './routes/admin'
 import { render } from './utils/request'
 import { storage } from './utils/storage'
 import suggestRouter from './routes/suggestions'
+import cors from 'cors'
 
 dotenv.config()
 
 const app = express()
 const SessionStore = FileStore(session)
+
+// Add CORS middleware before other middleware
+app.use(cors({
+	origin: '*',
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization']
+}))
 
 // Setup view engine
 app.set('view engine', 'ejs')

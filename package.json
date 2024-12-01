@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/chocoOnEstrogen/AnimeStream#readme",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
@@ -33,6 +34,7 @@
   "dependencies": {
     "@types/session-file-store": "^1.2.5",
     "axios": "^1.7.8",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
