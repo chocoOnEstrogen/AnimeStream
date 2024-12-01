@@ -252,8 +252,8 @@ class Storage {
 	  // Watch history methods
 	  async addToWatchHistory(userId: string, animeId: string, season: string, episode: string, progress: number): Promise<void> {
 		const entry = {
-		  userId,
-		  animeId,
+		  user_id: userId,
+		  anime_id: animeId,
 		  season,
 		  episode,
 		  progress,
@@ -263,7 +263,7 @@ class Storage {
 		const { error } = await supabase
 		  .from('watch_history')
 		  .upsert(entry, { 
-			onConflict: 'userId,animeId,season,episode'
+			onConflict: 'user_id,anime_id,season,episode'
 		  })
 	
 		if (error) {
