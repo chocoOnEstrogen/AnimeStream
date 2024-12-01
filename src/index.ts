@@ -18,6 +18,7 @@ import { render } from './utils/request'
 import { storage } from './utils/storage'
 import suggestRouter from './routes/suggestions'
 import cors from 'cors'
+import http from 'http'
 
 dotenv.config()
 
@@ -300,7 +301,13 @@ app.use((req: express.Request, res: express.Response) => {
 	})
 })
 
-app.listen(3000, '0.0.0.0', async () => {
+// Create HTTP server instance
+const server = http.createServer(app)
+
+
+
+// Change the app.listen to server.listen
+server.listen(3000, '0.0.0.0', async () => {
 	console.clear()
 	console.log(
 		`${constants.APP_NAME} v${constants.APP_VERSION} is running on ${config.baseUrl}`,
@@ -319,3 +326,5 @@ app.use((req, res, next) => {
 	}
 	next()
 })
+
+export { app, server }

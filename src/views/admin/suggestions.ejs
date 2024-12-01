@@ -77,6 +77,10 @@
                                             onclick="viewDetails('<%= suggestion.id %>')">
                                         Details
                                     </button>
+                                    <button class="btn btn-outline-info" 
+                                            onclick="viewInfoIni('<%= suggestion.malId %>', '<%= suggestion.title %>')">
+                                        <i class="bi bi-file-text"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -101,6 +105,76 @@
         </div>
     </div>
 </div>
+
+<!-- Update the info.ini modal -->
+<div class="modal fade" id="infoIniModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">info.ini Preview</h5>
+                <div class="btn-group ms-2">
+                    <button class="btn btn-sm btn-outline-light" onclick="copyInfoIni()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="downloadInfoIni()">
+                        <i class="bi bi-download"></i> Download
+                    </button>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="infoIniContent" class="bg-dark p-3 rounded" style="white-space: pre-wrap;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom CSS for syntax highlighting -->
+<style>
+.ini-section {
+    color: #FF79C6;
+    font-weight: bold;
+}
+
+.ini-key {
+    color: #8BE9FD;
+}
+
+.ini-equals {
+    color: #F8F8F2;
+    margin: 0 0.5em;
+}
+
+.ini-value {
+    color: #F1FA8C;
+}
+
+.ini-comment {
+    color: #6272A4;
+    font-style: italic;
+}
+
+#infoIniContent {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    background-color: #282A36 !important;
+    border: 1px solid #44475A;
+}
+
+#infoIniModal .modal-content {
+    background-color: #282A36 !important;
+    border: 1px solid #44475A;
+}
+
+#infoIniModal .modal-header {
+    border-bottom: 1px solid #44475A;
+}
+
+#infoIniModal .btn-outline-light:hover {
+    background-color: #44475A;
+}
+</style>
 
 <script>
 function filterSuggestions(status) {
@@ -162,6 +236,86 @@ function viewDetails(id) {
     
     document.getElementById('modalContent').innerHTML = content;
     new bootstrap.Modal(document.getElementById('detailsModal')).show();
+}
+
+function formatInfoIni(malData, title) {
+    const dateAdded = new Date().toISOString();
+    
+    const content = `[General]
+Title=${title}
+Type=${malData.type || 'TV'}
+Genre=${malData.genres?.join(', ') || ''}
+Description=${(malData.synopsis || '').replace(/\n/g, ' ')}
+Mal_ID=${malData.id || ''}
+Date_Added=${dateAdded}`;
+
+    return highlightIniSyntax(content);
+}
+
+function highlightIniSyntax(content) {
+    const lines = content.split('\n');
+    return lines.map(line => {
+        // Section headers [Section]
+        if (line.match(/^\[.*\]$/)) {
+            return `<span class="ini-section">${line}</span>`;
+        }
+        
+        // Key=Value pairs
+        const parts = line.split('=');
+        if (parts.length === 2) {
+            const [key, value] = parts;
+            return `<span class="ini-key">${key}</span><span class="ini-equals">=</span><span class="ini-value">${value}</span>`;
+        }
+        
+        // Comments
+        if (line.startsWith(';')) {
+            return `<span class="ini-comment">${line}</span>`;
+        }
+        
+        return line;
+    }).join('\n');
+}
+
+async function viewInfoIni(malId, title) {
+    try {
+        const res = await fetch(`/admin/mal/${malId}`);
+        if (!res.ok) throw new Error('Failed to fetch MAL data');
+        const malData = await res.json();
+        
+        const infoIni = formatInfoIni(malData, title);
+        document.getElementById('infoIniContent').innerHTML = infoIni;
+        new bootstrap.Modal(document.getElementById('infoIniModal')).show();
+    } catch (error) {
+        console.error('Error fetching MAL data:', error);
+        alert('Failed to fetch MAL data');
+    }
+}
+
+function copyInfoIni() {
+    // Get the text content without HTML tags
+    const content = document.getElementById('infoIniContent').textContent;
+    navigator.clipboard.writeText(content)
+        .then(() => {
+            const copyBtn = document.querySelector('#infoIniModal .bi-clipboard').parentElement;
+            copyBtn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+            }, 2000);
+        })
+        .catch(err => console.error('Failed to copy:', err));
+}
+
+function downloadInfoIni() {
+    const content = document.getElementById('infoIniContent').textContent;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'info.ini';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 </script>
 

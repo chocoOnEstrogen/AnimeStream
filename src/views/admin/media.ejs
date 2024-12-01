@@ -74,22 +74,20 @@
                             </td>
                             <td><%= item.type %></td>
                             <td><%= Object.keys(item.seasons).length %></td>
-                            <td><%= Object.values(item.seasons).flat().length %></td>
-                            <td><%= new Date(item.dateAdded).toLocaleDateString() %></td>
+                            <td>
+                                <%= Object.values(item.seasons).reduce((total, season) => 
+                                    total + season.length, 0) %>
+                            </td>
+                            <td><%= new Date(item.addedAt).toLocaleDateString() %></td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="/details/<%= item.id %>" 
-                                       class="btn btn-outline-primary"
-                                       target="_blank">
-                                        <i class="bi bi-eye"></i>
+                                    <a href="/watch/<%= item.id %>" 
+                                       class="btn btn-outline-primary">
+                                        Watch
                                     </a>
-                                    <button onclick="refreshMetadata('<%= item.id %>')" 
-                                            class="btn btn-outline-secondary">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
-                                    <button onclick="deleteMedia('<%= item.id %>')" 
-                                            class="btn btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
+                                    <button class="btn btn-outline-danger"
+                                            onclick="deleteAnime('<%= item.id %>')">
+                                        Delete
                                     </button>
                                 </div>
                             </td>
@@ -102,79 +100,52 @@
 </div>
 
 <script>
-// Filter media by search term
-function filterMedia(search) {
+function filterMedia(query) {
     const rows = document.querySelectorAll('#mediaTable tr');
-    const term = search.toLowerCase();
+    const searchQuery = query.toLowerCase();
     
     rows.forEach(row => {
         const title = row.dataset.title;
-        const type = row.dataset.type;
-        const isVisible = title.includes(term) && 
-            (!currentTypeFilter || type === currentTypeFilter);
-        row.style.display = isVisible ? '' : 'none';
+        if (title.includes(searchQuery)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
 }
 
-// Filter by type
-let currentTypeFilter = '';
 function filterByType(type) {
-    currentTypeFilter = type;
-    const search = document.getElementById('searchInput').value;
-    filterMedia(search);
+    const rows = document.querySelectorAll('#mediaTable tr');
+    rows.forEach(row => {
+        if (!type || row.dataset.type === type) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
 }
 
-// Scan media directories
 async function scanMedia() {
     try {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Scanning...';
-
         const res = await fetch('/admin/media/scan', { method: 'POST' });
         if (!res.ok) throw new Error('Failed to scan media');
-
-        // Reload page to show updated media
         location.reload();
     } catch (error) {
-        console.error('Error scanning media:', error);
-        alert('Failed to scan media directories');
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        console.error('Scan error:', error);
+        alert('Failed to scan media');
     }
 }
 
-// Refresh metadata for a specific anime
-async function refreshMetadata(animeId) {
+async function deleteAnime(id) {
+    if (!confirm('Are you sure you want to delete this anime?')) return;
+    
     try {
-        const res = await fetch(`/admin/media/${animeId}/refresh`, { method: 'POST' });
-        if (!res.ok) throw new Error('Failed to refresh metadata');
-        
-        // Show success message
-        alert('Metadata refreshed successfully');
+        const res = await fetch(`/admin/media/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete anime');
+        location.reload();
     } catch (error) {
-        console.error('Error refreshing metadata:', error);
-        alert('Failed to refresh metadata');
-    }
-}
-
-// Delete media entry
-async function deleteMedia(animeId) {
-    if (!confirm('Are you sure you want to delete this media entry? This will not delete the actual files.')) {
-        return;
-    }
-
-    try {
-        const res = await fetch(`/admin/media/${animeId}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed to delete media');
-        
-        // Remove row from table
-        const row = document.querySelector(`tr[data-anime-id="${animeId}"]`);
-        row?.remove();
-    } catch (error) {
-        console.error('Error deleting media:', error);
-        alert('Failed to delete media entry');
+        console.error('Delete error:', error);
+        alert('Failed to delete anime');
     }
 }
 </script>

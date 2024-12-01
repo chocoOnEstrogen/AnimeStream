@@ -4,6 +4,8 @@ import { storage } from '../utils/storage'
 import { render } from '../utils/request'
 import * as media from '../utils/media'
 import { config } from '../config'
+import * as malScraper from 'mal-scraper'
+
 
 const router = express.Router()
 
@@ -183,5 +185,12 @@ router.post('/suggestions/:id/status', async (req: Request, res: Response) => {
 		res.status(500).json({ error: 'Failed to update suggestion' })
 	}
 })
+
+router.get('/mal/:malId', async (req: Request, res: Response) => {
+	const { malId } = req.params
+	const malData = await malScraper.getInfoFromURL(`https://myanimelist.net/anime/${malId}`)
+	res.json(malData)
+})
+
 
 export default router
