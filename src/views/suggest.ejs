@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update preview modal
             document.getElementById('previewImage').innerHTML = `
-                <img src="${animeData.image}" alt="${animeData.title}" class="img-fluid rounded">
+                <img src="${animeData.image}" loading="lazy" alt="${animeData.title}" class="img-fluid rounded">
             `;
             document.getElementById('previewTitle').textContent = animeData.title;
             document.getElementById('previewSynopsis').textContent = animeData.synopsis;
@@ -192,7 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = suggestions.length ? suggestions.map(s => `
                 <div class="list-group-item">
                     <div class="d-flex gap-3">
-                        <img src="${s.image}" alt="${s.title}" style="width: 64px; height: 90px; object-fit: cover;">
+                        <img src="${s.image}" 
+                             loading="lazy" 
+                             alt="${s.title}" 
+                             style="width: 64px; height: 90px; object-fit: cover;">
                         <div class="flex-grow-1">
                             <h6 class="mb-1">${s.title}</h6>
                             <p class="mb-1 small text-body-secondary">${s.synopsis.substring(0, 100)}...</p>

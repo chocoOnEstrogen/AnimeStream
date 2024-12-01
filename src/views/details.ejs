@@ -7,6 +7,7 @@
                  class="w-100" 
                  alt="<%= anime.title %> Banner"
                  style="height: 300px; object-fit: cover;"
+                 loading="lazy"
                  onerror="this.onerror=null; this.src='/images/no-banner.jpg';">
         </div>
     <% } %>
@@ -18,6 +19,7 @@
                 <img src="/media/cover/<%= anime.id %>" 
                      class="img-fluid rounded mb-3" 
                      alt="<%= anime.title %> Cover"
+                     loading="lazy"
                      onerror="this.onerror=null; this.src='/images/no-cover.jpg';">
             <% } %>
             

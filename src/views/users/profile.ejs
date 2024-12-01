@@ -10,7 +10,8 @@
                          alt="Avatar"
                          class="rounded-circle"
                          width="100"
-                         height="100">
+                         height="100"
+                         loading="lazy">
                     <div>
                         <h1 class="h3 mb-1"><%= profile.username %></h1>
                         <p class="mb-0 text-white-50">Member since <%= new Date(profile.createdAt).toLocaleDateString() %></p>
@@ -46,6 +47,7 @@
                                 <div class="col">
                                     <div class="card h-100">
                                         <img src="/media/cover/<%= anime.id %>" 
+                                             loading="lazy"
                                              class="card-img-top" 
                                              alt="<%= anime.title %>">
                                         <div class="card-body">

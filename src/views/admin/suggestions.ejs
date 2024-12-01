@@ -42,7 +42,8 @@
                                          class="rounded me-2"
                                          width="48"
                                          height="48"
-                                         style="object-fit: cover;">
+                                         style="object-fit: cover;"
+                                         loading="lazy">
                                     <div>
                                         <h6 class="mb-0"><%= suggestion.title %></h6>
                                         <small class="text-body-secondary">
@@ -215,7 +216,10 @@ function viewDetails(id) {
     const content = `
         <div class="row">
             <div class="col-md-4">
-                <img src="${suggestion.image}" class="img-fluid rounded" alt="Cover">
+                <img src="${suggestion.image}" 
+                     loading="lazy"
+                     class="img-fluid rounded" 
+                     alt="Cover">
             </div>
             <div class="col-md-8">
                 <h4>${suggestion.title}</h4>
