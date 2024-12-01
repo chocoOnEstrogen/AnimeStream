@@ -39,6 +39,7 @@ SESSION_SECRET=your_session_secret
 BASE_URL=http://localhost:3000
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
+DISCORD_BOT_TOKEN=your_discord_bot_token
 ```
 
 3. Install dependencies:

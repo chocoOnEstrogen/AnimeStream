@@ -21,6 +21,7 @@ import cors from 'cors'
 import http from 'http'
 import apiRouter from './routes/api'
 import docsRouter from './routes/docs'
+import { startUserUpdateCron } from './utils/user'
 
 dotenv.config()
 
@@ -315,6 +316,7 @@ server.listen(config.port as number, '0.0.0.0', async () => {
 	console.log(
 		`${constants.APP_NAME} v${constants.APP_VERSION} is running on ${config.baseUrl}`,
 	)
+	startUserUpdateCron()
 })
 
 app.use((req, res, next) => {
