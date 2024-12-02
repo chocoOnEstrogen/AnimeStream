@@ -27,10 +27,9 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
-            <!-- Logo -->
-            <a class="navbar-brand" href="/">
+            <!-- Move it to the left -->
+            <a class="navbar-brand ms-2" href="/" style="margin-left: 1rem;">
                 <i class="bi bi-play-circle-fill text-primary me-2"></i>
-                <span class="fw-bold">Anime</span>Stream
             </a>
 
             <!-- Mobile Toggle -->
@@ -64,18 +63,26 @@
                 </ul>
 
                 <!-- Search Bar -->
-                <form class="search-form me-2" action="/search" method="GET">
-                    <div class="input-group">
-                        <input type="search" 
-                               name="q" 
-                               class="form-control search-input" 
-                               placeholder="Search anime..."
-                               aria-label="Search">
-                        <button class="btn btn-outline-primary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
+                <button class="btn btn-link nav-link search-trigger" type="button" data-bs-toggle="modal" data-bs-target="#searchModal">
+                    <i class="bi bi-search"></i>
+                </button>
+
+                <!-- Bot Status -->
+                <div class="bot-status me-3 d-none d-lg-flex align-items-center">
+                    <div class="status-indicator <%= botStatus.online ? 'online' : 'offline' %> me-2"></div>
+                    <div class="status-details">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="status-item" title="Server Count">
+                                <i class="bi bi-hdd-rack me-1"></i>
+                                <%= botStatus.guildCount %>
+                            </span>
+                            <span class="status-item" title="Ping">
+                                <i class="bi bi-reception-4 me-1"></i>
+                                <%= botStatus.ping %>ms
+                            </span>
+                        </div>
                     </div>
-                </form>
+                </div>
 
                 <!-- User Menu -->
                 <div class="nav-item">
@@ -133,3 +140,24 @@
     <!-- Main Content -->
     <main class="py-4">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+        <!-- Add this modal before the closing </body> tag -->
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="search-modal-inner">
+                        <form class="search-modal-form" action="/search" method="GET">
+                            <div class="search-input-group">
+                                <i class="bi bi-search search-icon"></i>
+                                <input type="search" 
+                                       name="q" 
+                                       class="form-control search-input" 
+                                       placeholder="Type and hit Enter"
+                                       aria-label="Search">
+                            </div>
+                        </form>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>

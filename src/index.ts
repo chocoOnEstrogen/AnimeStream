@@ -24,6 +24,8 @@ import docsRouter from './routes/docs'
 import { startUserUpdateCron } from './utils/user'
 import { startBot as startDiscordBot } from './bot'
 import blogRouter from './routes/blog'
+import cron from 'node-cron'
+import { getBotStatus } from './utils/discord'
 
 dotenv.config()
 
@@ -330,8 +332,22 @@ server.listen(config.port as number, '0.0.0.0', async () => {
 	console.log(
 		`${constants.APP_NAME} v${constants.APP_VERSION} is running on ${config.baseUrl}`,
 	)
+	
+	// Start all background tasks
 	startUserUpdateCron()
 	startDiscordBot()
+	setTimeout(async () => {
+		await getBotStatus()
+	}, 1000)
+	
+	// Update bot status 5 minutes
+	cron.schedule('*/5 * * * * *', async () => {
+		try {
+			await getBotStatus()
+		} catch (error) {
+			console.error('Failed to update bot status:', error)
+		}
+	})
 })
 
 app.use((req, res, next) => {

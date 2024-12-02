@@ -52,22 +52,85 @@ main {
     color: #7952b3 !important;
 }
 
-/* Search Bar */
+/* Search Modal Styles */
+.search-trigger {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    margin-right: 1rem;
+}
+
+.search-trigger:hover {
+    color: white;
+}
+
+.search-modal-inner {
+    background: rgba(18, 18, 18, 0.98);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    position: relative;
+}
+
+.search-modal-form {
+    width: 100%;
+    max-width: 800px;
+    padding: 0 2rem;
+}
+
+.search-input-group {
+    position: relative;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.modal .search-input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    padding: 0.5rem 0 0.5rem 3rem;
+    width: 100%;
+    box-shadow: none;
+}
+
+.modal .search-input:focus {
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.modal .search-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.modal .btn-close {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: white;
+    opacity: 0.5;
+    font-size: 1.5rem;
+}
+
+.modal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Remove the old search form styles */
 .search-form {
-    width: 300px;
-    margin-left: 1rem;
-}
-
-.search-input {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.375rem 1rem;
-}
-
-.search-input:focus {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(121, 82, 179, 0.5);
-    box-shadow: 0 0 0 0.25rem rgba(121, 82, 179, 0.25);
+    display: none;
 }
 
 /* Container Adjustments */
@@ -267,4 +330,57 @@ main {
 .preloader .spinner-border {
     width: 3rem;
     height: 3rem;
+}
+
+/* Bot Status Styles */
+.bot-status {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.online {
+    background: #43b581;
+    box-shadow: 0 0 10px rgba(67, 181, 129, 0.5);
+}
+
+.status-indicator.offline {
+    background: #f04747;
+    box-shadow: 0 0 10px rgba(240, 71, 71, 0.5);
+}
+
+.status-details {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.status-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.status-item i {
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .bot-status {
+        margin: 1rem 0;
+        width: 100%;
+        justify-content: center;
+    }
 } 

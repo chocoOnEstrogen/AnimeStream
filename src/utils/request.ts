@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import * as constants from '../constants'
 import { config } from '../config'
 import { User } from '../types/user'
+import { cache as botCache } from './discord'
 
 interface RenderData {
 	title?: string
@@ -25,6 +26,14 @@ export const render = (
 		data.title = constants.APP_NAME
 	}
 
+	// Get bot status directly from the shared cache
+	const botData = botCache.get('botStatus') || {
+		online: false,
+		guildCount: 0,
+		ping: 0,
+		uptime: null
+	}
+
 	res.render(template, {
 		...data,
 		path,
@@ -33,7 +42,7 @@ export const render = (
 		constants,
 		config,
 		flash: (req as any).flash,
-		title:
-			data.title ? `${data.title} - ${constants.APP_NAME}` : constants.APP_NAME,
+			botStatus: botData,
+		title: data.title ? `${data.title} - ${constants.APP_NAME}` : constants.APP_NAME,
 	})
 }
