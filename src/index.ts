@@ -26,6 +26,7 @@ import { startBot as startDiscordBot } from './bot'
 import blogRouter from './routes/blog'
 import cron from 'node-cron'
 import { getBotStatus } from './utils/discord'
+import botRouter from './routes/bot'
 
 dotenv.config()
 
@@ -288,6 +289,10 @@ app.get('/search', async (req: Request, res: Response) => {
 	}
 })
 
+app.get('/invite', (req: Request, res: Response) => {
+	res.redirect(`https://discord.com/oauth2/authorize?client_id=${config.discord.clientId}&permissions=8&scope=bot`)
+})
+
 app.use('/media', mediaRouter)
 app.use('/stream', streamRouter)
 app.use('/users', userRouter)
@@ -297,6 +302,7 @@ app.use('/suggest', suggestRouter)
 app.use('/api', apiRouter)
 app.use('/docs', docsRouter)
 app.use('/blog', blogRouter)
+app.use('/bot', botRouter)
 
 // Basic error handler
 app.use(

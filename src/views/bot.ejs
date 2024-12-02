@@ -1,0 +1,325 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+    <!-- Hero Section -->
+    <div class="bot-hero mb-5 rounded-4 p-5 text-white position-relative overflow-hidden">
+        <div class="row align-items-center">
+            <div class="col-md-8 position-relative z-2">
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <img src="<%= bot.user?.displayAvatarURL({ size: 128 }) %>" 
+                         alt="Bot Avatar"
+                         class="rounded-circle border border-3 border-white"
+                         width="128"
+                         height="128">
+                    <div>
+                        <h1 class="display-4 mb-2"><%= bot.user?.username %></h1>
+                        <div class="d-flex flex-wrap gap-3">
+                            <span class="badge rounded-pill <%= botStatus.online ? 'bg-success' : 'bg-danger' %> px-3 py-2">
+                                <i class="bi <%= botStatus.online ? 'bi-circle-fill' : 'bi-circle' %> me-2"></i>
+                                <%= botStatus.online ? 'Online' : 'Offline' %>
+                            </span>
+                            <span class="badge rounded-pill bg-primary px-3 py-2">
+                                <i class="bi bi-hdd-rack me-2"></i><%= botStatus.guildCount %> Servers
+                            </span>
+                            <span class="badge rounded-pill bg-info px-3 py-2">
+                                <i class="bi bi-reception-4 me-2"></i><%= botStatus.ping %>ms
+                            </span>
+                            <% if (botStatus.uptime) { %>
+                                <span class="badge rounded-pill bg-warning px-3 py-2">
+                                    <i class="bi bi-clock me-2"></i><%= Math.floor(botStatus.uptime / (1000 * 60 * 60)) %>h uptime
+                                </span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <p class="lead mb-4">Your Discord companion for anime updates and notifications.</p>
+                <a href="/invite" class="btn btn-primary btn-lg">
+                    <i class="bi bi-discord me-2"></i>Add to Server
+                </a>
+            </div>
+        </div>
+        <div class="bot-hero-bg"></div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="discord-stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-hdd-rack"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 class="stat-value"><%= botStatus.guildCount %></h3>
+                    <p class="stat-label">Servers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="discord-stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 class="stat-value"><%= guilds.reduce((acc, guild) => acc + guild.memberCount, 0) %></h3>
+                    <p class="stat-label">Total Members</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="discord-stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-lightning"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 class="stat-value"><%= botStatus.ping %>ms</h3>
+                    <p class="stat-label">Latency</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="discord-stat-card">
+                <div class="stat-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 class="stat-value"><%= Math.floor(botStatus.uptime / (1000 * 60 * 60)) %>h</h3>
+                    <p class="stat-label">Uptime</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <h2 class="h3 mb-4">Features</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="discord-embed">
+                <div class="embed-title">
+                    <i class="bi bi-megaphone me-2"></i>Announcements
+                </div>
+                <div class="embed-description">
+                    Get notified about new blog posts, updates, and important announcements in your designated channel.
+                </div>
+                <div class="embed-fields">
+                    <div class="embed-field">
+                        <div class="field-name">Command</div>
+                        <div class="field-value"><code>/manage updates</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="discord-embed">
+                <div class="embed-title">
+                    <i class="bi bi-bell me-2"></i>Notifications
+                </div>
+                <div class="embed-description">
+                    Stay updated with new anime additions and episode releases through Discord notifications.
+                </div>
+                <div class="embed-fields">
+                    <div class="embed-field">
+                        <div class="field-name">Command</div>
+                        <div class="field-value"><code>/notifications</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="discord-embed">
+                <div class="embed-title">
+                    <i class="bi bi-gear me-2"></i>Server Management
+                </div>
+                <div class="embed-description">
+                    Easily manage bot settings and permissions directly from Discord.
+                </div>
+                <div class="embed-fields">
+                    <div class="embed-field">
+                        <div class="field-name">Command</div>
+                        <div class="field-value"><code>/help</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servers -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Active Servers</h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Sort by
+            </button>
+            <ul class="dropdown-menu">
+                <li><button class="dropdown-item" onclick="sortGuilds('members')">Member Count</button></li>
+                <li><button class="dropdown-item" onclick="sortGuilds('date')">Join Date</button></li>
+                <li><button class="dropdown-item" onclick="sortGuilds('name')">Name</button></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="guilds-container">
+        <% guilds.forEach(guild => { %>
+            <div class="col" data-members="<%= guild.memberCount %>" data-date="<%= guild.joinedAt.getTime() %>" data-name="<%= guild.name.toLowerCase() %>">
+                <div class="card h-100 border-0 shadow-sm discord-card">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <% if (guild.icon) { %>
+                            <img src="<%= guild.icon %>" 
+                                 alt="<%= guild.name %>"
+                                 class="rounded-circle"
+                                 width="48"
+                                 height="48"
+                                 loading="lazy">
+                        <% } else { %>
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px;">
+                                <i class="bi bi-discord text-white"></i>
+                            </div>
+                        <% } %>
+                        <div>
+                            <h3 class="h6 mb-2"><%= guild.name %></h3>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge rounded-pill bg-secondary">
+                                    <i class="bi bi-people me-1"></i><%= guild.memberCount %>
+                                </span>
+                                <span class="badge rounded-pill bg-info">
+                                    <i class="bi bi-calendar me-1"></i><%= guild.joinedAt.toLocaleDateString() %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div>
+
+<style>
+.bot-hero {
+    background: #5865f2;
+}
+
+.bot-hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/images/discord-pattern.svg') center/cover;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.discord-stat-card {
+    background: #2f3136;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    color: #5865f2;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
+}
+
+.stat-label {
+    color: #b9bbbe;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.discord-embed {
+    background: #2f3136;
+    border-left: 4px solid #5865f2;
+    border-radius: 4px;
+    padding: 1rem;
+    height: 100%;
+    transition: transform 0.2s;
+}
+
+.discord-embed:hover {
+    transform: translateY(-4px);
+}
+
+.embed-title {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.embed-description {
+    color: #dcddde;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.embed-fields {
+    border-top: 1px solid #40444b;
+    padding-top: 0.5rem;
+}
+
+.embed-field {
+    margin-top: 0.5rem;
+}
+
+.field-name {
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+.field-value {
+    color: #dcddde;
+    font-size: 0.9rem;
+}
+
+.discord-card {
+    background: #2f3136;
+    transition: transform 0.2s;
+}
+
+.discord-card:hover {
+    transform: translateY(-4px);
+}
+
+code {
+    background: #202225;
+    color: #dcddde;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function sortGuilds(criteria) {
+    const container = document.getElementById('guilds-container');
+    const guilds = Array.from(container.children);
+    
+    guilds.sort((a, b) => {
+        const aValue = a.dataset[criteria];
+        const bValue = b.dataset[criteria];
+        
+        if (criteria === 'members' || criteria === 'date') {
+            return parseInt(bValue) - parseInt(aValue);
+        }
+        return aValue.localeCompare(bValue);
+    });
+    
+    guilds.forEach(guild => container.appendChild(guild));
+}
+</script>
+
+<%- include('partials/footer') %> 
