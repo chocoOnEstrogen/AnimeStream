@@ -33,6 +33,8 @@ client.commands = commands
 
 loadEvents(join(__dirname, 'events'), client)
 
-export default function () {
+export function startBot() {
 	client.login(token)
 }
+
+export default client

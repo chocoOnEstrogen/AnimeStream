@@ -22,7 +22,7 @@ import http from 'http'
 import apiRouter from './routes/api'
 import docsRouter from './routes/docs'
 import { startUserUpdateCron } from './utils/user'
-import bot from './bot'
+import { startBot as startDiscordBot } from './bot'
 import blogRouter from './routes/blog'
 
 dotenv.config()
@@ -51,7 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Session middleware
 app.use(
 	session({
-			store: new SessionStore({
+		store: new SessionStore({
 			path: path.join(__dirname, '../data/sessions'),
 			ttl: 86400, // 1 day in seconds
 			reapInterval: 3600, // 1 hour in seconds
@@ -331,7 +331,7 @@ server.listen(config.port as number, '0.0.0.0', async () => {
 		`${constants.APP_NAME} v${constants.APP_VERSION} is running on ${config.baseUrl}`,
 	)
 	startUserUpdateCron()
-	bot()
+	startDiscordBot()
 })
 
 app.use((req, res, next) => {

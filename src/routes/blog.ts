@@ -14,6 +14,17 @@ import { registry } from '../build/components/registry'
 import he from 'he'
 import hljs from 'highlight.js'
 import matter from 'gray-matter'
+import { Bot } from '../types/bot'
+import { Client } from 'discord.js'
+import { sendBlogNotification } from '../bot/utils/manager'
+
+declare global {
+	namespace Express {
+		interface Request {
+			bot?: Bot<Client>
+		}
+	}
+}
 
 const router = Router()
 const upload = multer({
@@ -331,7 +342,7 @@ router.post(
 	authMiddleware,
 	adminMiddleware,
 	upload.single('image'),
-    //@ts-ignore
+	//@ts-ignore
 	async (req: Request, res: Response) => {
 		try {
 			if (!req.file) {
@@ -411,6 +422,11 @@ router.post(
 				author_id: req.user?.id,
 				published_at: status === 'published' ? new Date().toISOString() : null,
 				cover_image: coverImage,
+			}
+
+			// Send notification if the new post is published
+			if (status === 'published') {
+				await sendBlogNotification(post)
 			}
 
 			const { data, error } = await supabase

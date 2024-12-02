@@ -224,6 +224,7 @@ router.post('/blog/:id?', async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params
 		const { title, content, excerpt, status, tags, featured_image } = req.body
+		const wasPublished = status === 'published'
 
 		const slug = title
 			.toLowerCase()
@@ -243,14 +244,34 @@ router.post('/blog/:id?', async (req: Request, res: Response) => {
 			updated_at: new Date().toISOString(),
 		}
 
+		let post
 		if (id) {
+			// Get previous status
+			const { data: oldPost } = await supabase
+				.from('blog')
+				.select('status')
+				.eq('id', id)
+				.single()
+
 			// Update existing post
-			await supabase.from('blog').update(postData).eq('id', id)
+			const { data: updatedPost } = await supabase
+				.from('blog')
+				.update(postData)
+				.eq('id', id)
+				.select()
+				.single()
+			
+			post = updatedPost
+
 		} else {
 			// Create new post
-			await supabase
+			const { data: newPost } = await supabase
 				.from('blog')
 				.insert([{ ...postData, id: crypto.randomUUID() }])
+				.select()
+				.single()
+			
+			post = newPost
 		}
 
 		res.json({ success: true })

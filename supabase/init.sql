@@ -63,6 +63,13 @@ CREATE TABLE blog (
   published_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Discord guilds table
+CREATE TABLE guilds (
+  id TEXT PRIMARY KEY,
+  updates_channel_id TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_users_roles ON users USING GIN (roles);
 CREATE INDEX idx_watch_history_timestamp ON watch_history (timestamp DESC);
@@ -74,3 +81,7 @@ CREATE INDEX idx_blog_status ON blog (status);
 CREATE INDEX idx_blog_author ON blog (author_id);
 CREATE INDEX idx_blog_published_at ON blog (published_at DESC);
 CREATE INDEX idx_blog_tags ON blog USING GIN (tags);
+
+-- Create index for the guilds table
+CREATE INDEX idx_guilds_updates_channel_id ON guilds (updates_channel_id);
+
