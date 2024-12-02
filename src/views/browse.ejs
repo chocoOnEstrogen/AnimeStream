@@ -24,7 +24,7 @@
                                 <%= anime.type %> • <%= anime.genre.join(', ') %>
                             </small>
                         </p>
-                        <p class="card-text"><%= anime.description %></p>
+                        <p class="card-text"><%= anime.description.substring(0, 100) %>...</p>
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-between align-items-center">

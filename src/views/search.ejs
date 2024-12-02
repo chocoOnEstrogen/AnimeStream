@@ -104,7 +104,7 @@
                                     <%= anime.type %> • <%= anime.genre.join(', ') %>
                                 </p>
                                 <p class="card-text small text-truncate">
-                                    <%= anime.description %>
+                                    <%= anime.description.substring(0, 100) %>...
                                 </p>
                             </div>
                             <div class="card-footer bg-transparent border-top-0">
