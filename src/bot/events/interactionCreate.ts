@@ -5,7 +5,6 @@ export default {
 	name: Events.InteractionCreate,
 	once: false,
 	async execute(client: Bot<Client>, interaction: Interaction) {
-
 		if (interaction.isChatInputCommand()) {
 			const command = client.commands.get(interaction.commandName)
 			if (!command) {

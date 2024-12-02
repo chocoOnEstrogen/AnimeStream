@@ -9,15 +9,15 @@ const router = Router()
 //@ts-ignore
 router.get('/blog/:slug/:filename', async (req: Request, res: Response) => {
 	const { slug, filename } = req.params
-	
+
 	try {
 		const imagePath = path.join(config.blogMedia, slug, `${filename}.jpg`)
-		
+
 		if (fs.existsSync(imagePath)) {
 			res.type('image/jpeg')
 			return res.sendFile(imagePath)
 		}
-		
+
 		return res.status(404).send('Image not found')
 	} catch (error) {
 		console.error(`Error serving media file:`, error)

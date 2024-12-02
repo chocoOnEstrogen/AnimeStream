@@ -11,16 +11,27 @@ class ComponentRegistry {
 	}
 
 	private async loadComponentsFromDirectory(directory: string): Promise<void> {
+		console.log(`Loading components from ${directory}`)
 		try {
 			const files = fs.readdirSync(directory)
 
 			for (const file of files) {
-				// Skip non-TypeScript files and index files
-				if (!file.endsWith('.ts') || file === 'index.ts') continue
+				// Skip non-JavaScript/TypeScript files and index files
+				if (
+					!file.match(/\.(js|ts)$/) ||
+					file === 'index.js' ||
+					file === 'index.ts'
+				)
+					continue
 
+				console.log(`Loading component from ${file}`)
 				try {
+					// Clear require cache to ensure fresh load
+					const modulePath = path.join(directory, file)
+					delete require.cache[require.resolve(modulePath)]
+
 					// Import the component module
-					const componentModule = require(path.join(directory, file))
+					const componentModule = require(modulePath)
 
 					// Get the component class
 					const ComponentClass = componentModule.default
@@ -32,9 +43,9 @@ class ComponentRegistry {
 					// Create an instance of the component
 					const component = new ComponentClass()
 
-					// Get the component name from the file name
+					// Get the component name from the file name (without extension)
 					const componentName = path
-						.basename(file, '.ts')
+						.basename(file, path.extname(file))
 						.toLowerCase()
 						.replace(/[^a-z0-9]+/g, '-')
 
@@ -72,6 +83,7 @@ class ComponentRegistry {
 			console.error(
 				`Component "${name}" not found. Available components:`,
 				Array.from(this.components.keys()),
+				`\n\nAvailable components from registry.ts:\n${this.listComponents().join('\n')}`,
 			)
 			throw new Error(`Component "${name}" not found`)
 		}
@@ -94,4 +106,8 @@ class ComponentRegistry {
 	}
 }
 
-export const registry = new ComponentRegistry()
+// Create a singleton instance
+const registry = new ComponentRegistry()
+
+// Export both the class and the singleton instance
+export { ComponentRegistry, registry }

@@ -27,9 +27,7 @@ const client = new Client({
 
 client.commands = new Collection()
 
-
 loadCommands(join(__dirname, 'commands'))
-
 
 client.commands = commands
 

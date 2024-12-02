@@ -421,16 +421,20 @@ class Storage {
 	}
 
 	// Blog methods
-	async saveBlogImage(slug: string, imageType: 'cover' | 'content', file: Express.Multer.File): Promise<string> {
+	async saveBlogImage(
+		slug: string,
+		imageType: 'cover' | 'content',
+		file: Express.Multer.File,
+	): Promise<string> {
 		const mediaDir = path.join(config.blogMedia, slug)
-		
+
 		try {
 			// Create directory if it doesn't exist
 			await fs.mkdir(mediaDir, { recursive: true })
-			
+
 			// Process image with sharp
 			const image = sharp(file.buffer)
-			
+
 			// Resize based on image type
 			if (imageType === 'cover') {
 				await image
@@ -444,7 +448,7 @@ class Storage {
 					.jpeg({ quality: 80 })
 					.toFile(path.join(mediaDir, `${file.originalname}.jpg`))
 			}
-			
+
 			return imageType === 'cover' ? 'cover.jpg' : `${file.originalname}.jpg`
 		} catch (error) {
 			console.error('Error saving blog image:', error)
@@ -455,26 +459,54 @@ class Storage {
 	async sanitizeBlogContent(content: string): Promise<string> {
 		return sanitizeHtml(content, {
 			allowedTags: [
-				'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
-				'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-				'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'img'
+				'h1',
+				'h2',
+				'h3',
+				'h4',
+				'h5',
+				'h6',
+				'blockquote',
+				'p',
+				'a',
+				'ul',
+				'ol',
+				'nl',
+				'li',
+				'b',
+				'i',
+				'strong',
+				'em',
+				'strike',
+				'code',
+				'hr',
+				'br',
+				'div',
+				'table',
+				'thead',
+				'caption',
+				'tbody',
+				'tr',
+				'th',
+				'td',
+				'pre',
+				'img',
 			],
 			allowedAttributes: {
 				a: ['href', 'name', 'target'],
 				img: ['src', 'alt', 'title', 'width', 'height'],
-				'*': ['class', 'id']
+				'*': ['class', 'id'],
 			},
 			allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel'],
 			transformTags: {
-				'a': (tagName, attribs) => ({
+				a: (tagName, attribs) => ({
 					tagName,
 					attribs: {
 						...attribs,
 						target: '_blank',
-						rel: 'noopener noreferrer'
-					}
-				})
-			}
+						rel: 'noopener noreferrer',
+					},
+				}),
+			},
 		})
 	}
 
@@ -482,11 +514,11 @@ class Storage {
 		try {
 			const response = await axios.get(url, { responseType: 'arraybuffer' })
 			const buffer = Buffer.from(response.data, 'binary')
-			
+
 			// Create hash of image data for unique filename
 			const hash = createHash('md5').update(buffer).digest('hex')
 			const filename = `${hash}.jpg`
-			
+
 			// Save the image using our existing method
 			const file: Express.Multer.File = {
 				buffer,
@@ -498,7 +530,7 @@ class Storage {
 				stream: Readable.from(buffer),
 				destination: '',
 				filename: '',
-				path: ''
+				path: '',
 			}
 
 			await this.saveBlogImage(slug, 'content', file)
@@ -513,11 +545,11 @@ class Storage {
 		const imgRegex = /<img[^>]+src="([^">]+)"/g
 		let match
 		let processedContent = content
-		
+
 		// Find all image URLs in the content
 		while ((match = imgRegex.exec(content)) !== null) {
 			const imageUrl = match[1]
-			
+
 			// Only process external URLs
 			if (imageUrl.startsWith('http')) {
 				const filename = await this.downloadImage(imageUrl, slug)
@@ -525,12 +557,12 @@ class Storage {
 					// Replace external URL with local URL
 					processedContent = processedContent.replace(
 						imageUrl,
-						`/media/blog/${slug}/${filename}`
+						`/media/blog/${slug}/${filename}`,
 					)
 				}
 			}
 		}
-		
+
 		return processedContent
 	}
 }
