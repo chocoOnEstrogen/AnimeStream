@@ -23,6 +23,7 @@ import apiRouter from './routes/api'
 import docsRouter from './routes/docs'
 import { startUserUpdateCron } from './utils/user'
 import bot from './bot'
+import blogRouter from './routes/blog'
 
 dotenv.config()
 
@@ -43,14 +44,14 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
 // Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Session middleware
 app.use(
 	session({
-		store: new SessionStore({
+			store: new SessionStore({
 			path: path.join(__dirname, '../data/sessions'),
 			ttl: 86400, // 1 day in seconds
 			reapInterval: 3600, // 1 hour in seconds
@@ -176,6 +177,10 @@ app.get('/recent', async (req: Request, res: Response) => {
 	}
 })
 
+app.get('/discord', (req: Request, res: Response) => {
+	res.redirect(config.discord.invite)
+})
+
 app.get('/browse', async (req: Request, res: Response) => {
 	try {
 		// Scan all media directories and combine results
@@ -289,6 +294,7 @@ app.use('/admin', adminRouter)
 app.use('/suggest', suggestRouter)
 app.use('/api', apiRouter)
 app.use('/docs', docsRouter)
+app.use('/blog', blogRouter)
 
 // Basic error handler
 app.use(

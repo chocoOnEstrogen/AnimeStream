@@ -5,6 +5,8 @@ import { render } from '../utils/request'
 import * as media from '../utils/media'
 import { config } from '../config'
 import * as malScraper from 'mal-scraper'
+import { supabase } from '../utils/supabase'
+import crypto from 'crypto'
 
 const router = express.Router()
 
@@ -195,5 +197,106 @@ router.get('/mal/:malId', async (req: Request, res: Response) => {
 	)
 	res.json(malData)
 })
+
+// Blog management
+router.get('/blog', async (req: Request, res: Response) => {
+	try {
+		const { data: posts } = await supabase
+			.from('blog')
+			.select('*')
+			.order('created_at', { ascending: false });
+
+		render(req, res, 'admin/blog', {
+			title: 'Blog Management',
+			posts: posts || [],
+		});
+	} catch (error) {
+		console.error('Blog management error:', error);
+		render(req, res, 'error', {
+			title: 'Error',
+			error: 'Failed to load blog management'
+		});
+	}
+});
+
+// Create/Update blog post
+router.post('/blog/:id?', async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		const { title, content, excerpt, status, tags, featured_image } = req.body;
+		
+		const slug = title.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/(^-|-$)/g, '');
+
+		const postData = {
+			title,
+			slug,
+			content,
+			excerpt,
+			status,
+			tags: Array.isArray(tags) ? tags : [],
+			featured_image,
+			author_id: (req as any).user.id,
+			published_at: status === 'published' ? new Date().toISOString() : null,
+			updated_at: new Date().toISOString()
+		};
+
+		if (id) {
+			// Update existing post
+			await supabase
+				.from('blog')
+				.update(postData)
+				.eq('id', id);
+		} else {
+			// Create new post
+			await supabase
+				.from('blog')
+				.insert([{ ...postData, id: crypto.randomUUID() }]);
+		}
+
+		res.json({ success: true });
+	} catch (error) {
+		console.error('Blog post error:', error);
+		res.status(500).json({ error: 'Failed to save blog post' });
+	}
+});
+
+// Delete blog post
+
+router.delete('/blog/:id', async (req: Request, res: Response) => {
+	try {
+		const { id } = req.params;
+		await supabase
+			.from('blog')
+			.delete()
+			.eq('id', id);
+		res.json({ success: true });
+	} catch (error) {
+		console.error('Blog deletion error:', error);
+		res.status(500).json({ error: 'Failed to delete blog post' });
+	}
+});
+
+// Add this new route to get a single post
+//@ts-ignore
+router.get('/blog/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { data: post, error } = await supabase
+            .from('blog')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+
+        res.json(post);
+    } catch (error) {
+        console.error('Get blog post error:', error);
+        res.status(500).json({ error: 'Failed to fetch blog post' });
+    }
+});
 
 export default router

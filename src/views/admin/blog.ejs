@@ -1,0 +1,294 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Blog Posts</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#postModal" aria-label="Create new post">
+            <i class="bi bi-plus-lg me-2"></i>New Post
+        </button>
+    </div>
+
+    <!-- Post Modal -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postModalLabel">New Post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="postForm" onsubmit="savePost(event)">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" required aria-required="true">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Featured Image</label>
+                            <div class="featured-image-container position-relative" 
+                                 style="height: 200px; background-color: #f8f9fa; border-radius: 0.5rem; overflow: hidden;">
+                                <img id="featuredImagePreview" 
+                                     class="w-100 h-100 object-fit-cover d-none" 
+                                     alt="Featured image preview">
+                                <div id="featuredImagePlaceholder" 
+                                     class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                    <i class="bi bi-image display-4 text-secondary"></i>
+                                    <p class="text-secondary mb-0">Click to add featured image</p>
+                                </div>
+                                <input type="file" 
+                                       id="featuredImageInput" 
+                                       class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                                       accept="image/*" aria-label="Upload featured image">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="excerpt" class="form-label">Excerpt</label>
+                            <textarea class="form-control" id="excerpt" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea id="content"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="tagInput" placeholder="Add a tag..." aria-label="Tag input">
+                                <button class="btn btn-outline-secondary" type="button" onclick="addTag()" aria-label="Add tag">Add</button>
+                            </div>
+                            <div id="tagContainer" class="mt-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" aria-label="Post status">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" aria-label="Save post">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel edit">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts List -->
+    <div id="postsList">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Published</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% posts.forEach(post => { %>
+                        <tr>
+                            <td><%= post.title %></td>
+                            <td><span class="badge bg-<%= post.status === 'published' ? 'success' : 'secondary' %>">
+                                <%= post.status %>
+                            </span></td>
+                            <td><%= post.published_at ? new Date(post.published_at).toLocaleDateString() : '-' %></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editPost('<%= post.id %>')" aria-label="Edit post">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deletePost('<%= post.id %>')" aria-label="Delete post">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include EasyMDE -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+
+<script>
+let editor;
+let currentTags = [];
+let currentPostId = null;
+let featuredImageData = null;
+
+// Initialize EasyMDE
+document.addEventListener('DOMContentLoaded', function() {
+    editor = new EasyMDE({ element: document.getElementById('content') });
+});
+
+// Featured Image handling
+document.getElementById('featuredImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            featuredImageData = e.target.result;
+            const preview = document.getElementById('featuredImagePreview');
+            preview.src = featuredImageData;
+            preview.classList.remove('d-none');
+            document.getElementById('featuredImagePlaceholder').classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+function createNewPost() {
+    currentPostId = null;
+    featuredImageData = null;
+    currentTags = [];
+    document.getElementById('postForm').reset();
+    document.getElementById('tagContainer').innerHTML = '';
+    document.getElementById('featuredImagePreview').classList.add('d-none');
+    document.getElementById('featuredImagePlaceholder').classList.remove('d-none');
+    editor.value('');
+}
+
+function cancelEdit() {
+    document.getElementById('postEditor').classList.add('d-none');
+    document.getElementById('postsList').classList.remove('d-none');
+}
+
+function addTag() {
+    const input = document.getElementById('tagInput');
+    const tag = input.value.trim();
+    
+    if (tag && !currentTags.includes(tag)) {
+        currentTags.push(tag);
+        updateTagsDisplay();
+    }
+    
+    input.value = '';
+}
+
+function removeTag(tag) {
+    currentTags = currentTags.filter(t => t !== tag);
+    updateTagsDisplay();
+}
+
+function updateTagsDisplay() {
+    const container = document.getElementById('tagContainer');
+    container.innerHTML = currentTags.map(tag => `
+        <span class="badge bg-primary me-1 mb-1">
+            ${tag}
+            <button type="button" class="btn-close btn-close-white ms-2" 
+                    onclick="removeTag('${tag}')" style="font-size: 0.5em;" aria-label="Remove tag"></button>
+        </span>
+    `).join('');
+}
+
+async function savePost(event) {
+    event.preventDefault();
+    
+    try {
+        const postData = {
+            title: document.getElementById('title').value,
+            content: editor.value(),
+            tags: currentTags,
+            excerpt: document.getElementById('excerpt').value,
+            status: document.getElementById('status').value,
+            featuredImage: featuredImageData,
+            postId: currentPostId || 'temp'
+        };
+
+        const response = await fetch('/blog/post', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to save post');
+        
+        alert('Post saved successfully!');
+        location.reload();
+    } catch (error) {
+        console.error('Save error:', error);
+        alert('Failed to save post: ' + error.message);
+    }
+}
+
+async function editPost(id) {
+    try {
+        const response = await fetch(`/admin/blog/post/${id}`);
+        const post = await response.json();
+        
+        currentPostId = post.id;
+        currentTags = post.tags || [];
+        document.getElementById('title').value = post.title;
+        document.getElementById('excerpt').value = post.excerpt || '';
+        document.getElementById('status').value = post.status;
+        editor.value(post.content);
+        updateTagsDisplay();
+        
+        if (post.coverImage) {
+            const preview = document.getElementById('featuredImagePreview');
+            preview.src = `/media/blog/${post.id}/cover`;
+            preview.classList.remove('d-none');
+            document.getElementById('featuredImagePlaceholder').classList.add('d-none');
+        }
+        
+        document.getElementById('postsList').classList.add('d-none');
+        document.getElementById('postEditor').classList.remove('d-none');
+    } catch (error) {
+        console.error('Edit error:', error);
+        alert('Failed to load post: ' + error.message);
+    }
+}
+
+async function deletePost(id) {
+    try {
+        const response = await fetch(`/admin/blog/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete post');
+        
+        location.reload();
+    } catch (error) {
+        console.error('Delete error:', error);
+        alert('Failed to delete post: ' + error.message);
+    }
+}
+</script>
+
+<style>
+.featured-image-container:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+#featuredImageInput {
+    cursor: pointer;
+}
+
+.ck-editor__editable {
+    min-height: 400px;
+}
+
+.btn-close {
+    cursor: pointer;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+</style>
+
+<%- include('../partials/footer') %> 

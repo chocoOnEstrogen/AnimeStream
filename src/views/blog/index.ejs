@@ -1,0 +1,223 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <!-- Featured Post (if exists) -->
+    <% if (posts.find(p => p.featured)) { %>
+        <% const featured = posts.find(p => p.featured) %>
+        <div class="card mb-5 border-0 bg-dark text-white">
+            <% if (featured.cover_image) { %>
+                <img src="/media/blog/<%= featured.slug %>/cover" 
+                     class="card-img" 
+                     alt="<%= featured.title %>"
+                     style="height: 400px; object-fit: cover; opacity: 0.6;">
+            <% } %>
+            <div class="card-img-overlay d-flex flex-column justify-content-end">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="d-flex gap-2 mb-2">
+                                <% featured.tags.forEach(tag => { %>
+                                    <span class="badge bg-primary"><%= tag %></span>
+                                <% }) %>
+                            </div>
+                            <h2 class="card-title mb-2"><%= featured.title %></h2>
+                            <p class="card-text mb-3"><%= featured.excerpt %></p>
+                            <div class="d-flex align-items-center gap-3">
+                                <% if (featured.author) { %>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://cdn.discordapp.com/avatars/<%= featured.author.id %>/<%= featured.author.avatar %>.png"
+                                             class="rounded-circle me-2" 
+                                             alt="<%= featured.author.username %>"
+                                             width="32" height="32">
+                                        <span><%= featured.author.username %></span>
+                                    </div>
+                                <% } %>
+                                <span>•</span>
+                                <span><%= new Date(featured.published_at).toLocaleDateString() %></span>
+                                <a href="/blog/<%= featured.slug %>" class="btn btn-primary ms-auto">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Blog Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">Latest Posts</h1>
+                <% if (isAuthenticated && user.roles?.includes('admin')) { %>
+                    <a href="/admin/blog" class="btn btn-primary">
+                        <i class="bi bi-pencil-square me-2"></i>Manage Posts
+                    </a>
+                <% } %>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-body border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control border-start-0" 
+                           id="searchPosts" 
+                           placeholder="Search posts...">
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div class="row row-cols-1 row-cols-md-2 g-4" id="postsGrid">
+                <% posts.filter(p => !p.featured).forEach(post => { %>
+                    <div class="col post-card" data-tags="<%= post.tags.join(',') %>">
+                        <div class="card h-100">
+                            <% if (post.cover_image) { %>
+                                <img src="/media/blog/<%= post.slug %>/cover" 
+                                     class="card-img-top" 
+                                     alt="<%= post.title %>"
+                                     style="height: 200px; object-fit: cover;"
+                                     loading="lazy">
+                            <% } %>
+                            <div class="card-body">
+                                <div class="d-flex gap-2 mb-2">
+                                    <% post.tags.forEach(tag => { %>
+                                        <span class="badge bg-primary"><%= tag %></span>
+                                    <% }) %>
+                                </div>
+                                <h5 class="card-title"><%= post.title %></h5>
+                                <p class="card-text text-body-secondary">
+                                    <%= post.excerpt || post.content.substring(0, 150) + '...' %>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <% if (post.author) { %>
+                                            <img src="https://cdn.discordapp.com/avatars/<%= post.author.id %>/<%= post.author.avatar %>.png"
+                                                 class="rounded-circle" 
+                                                 alt="<%= post.author.username %>"
+                                                 width="24" height="24">
+                                            <small class="text-body-secondary"><%= post.author.username %></small>
+                                        <% } %>
+                                    </div>
+                                    <a href="/blog/<%= post.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Categories -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Categories</h5>
+                    <div class="d-flex flex-wrap gap-2" id="tagFilters">
+                        <% const allTags = [...new Set(posts.flatMap(p => p.tags))] %>
+                        <% allTags.forEach(tag => { %>
+                            <button class="btn btn-outline-primary btn-sm" data-tag="<%= tag %>">
+                                <%= tag %>
+                            </button>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Posts -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Popular Posts</h5>
+                    <div class="list-group list-group-flush">
+                        <% posts.slice(0, 5).forEach(post => { %>
+                            <a href="/blog/<%= post.slug %>" class="list-group-item list-group-item-action">
+                                <h6 class="mb-1"><%= post.title %></h6>
+                                <small class="text-body-secondary">
+                                    <%= new Date(post.published_at).toLocaleDateString() %>
+                                </small>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchPosts');
+    const postsGrid = document.getElementById('postsGrid');
+    const tagFilters = document.getElementById('tagFilters');
+    const posts = document.querySelectorAll('.post-card');
+    let activeTag = null;
+
+    // Search functionality
+    searchInput.addEventListener('input', filterPosts);
+
+    // Tag filtering
+    tagFilters.addEventListener('click', (e) => {
+        if (e.target.matches('[data-tag]')) {
+            const tag = e.target.dataset.tag;
+            
+            // Toggle active state
+            document.querySelectorAll('[data-tag]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (activeTag === tag) {
+                activeTag = null;
+            } else {
+                e.target.classList.add('active');
+                activeTag = tag;
+            }
+            
+            filterPosts();
+        }
+    });
+
+    function filterPosts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        posts.forEach(post => {
+            const title = post.querySelector('.card-title').textContent.toLowerCase();
+            const excerpt = post.querySelector('.card-text').textContent.toLowerCase();
+            const tags = post.dataset.tags.toLowerCase().split(',');
+            
+            const matchesSearch = title.includes(searchTerm) || excerpt.includes(searchTerm);
+            const matchesTag = !activeTag || tags.includes(activeTag.toLowerCase());
+            
+            post.style.display = matchesSearch && matchesTag ? '' : 'none';
+        });
+    }
+});
+</script>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.post-card .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+#tagFilters .btn.active {
+    background-color: var(--bs-primary);
+    color: white;
+}
+</style>
+
+<%- include('../partials/footer') %> 

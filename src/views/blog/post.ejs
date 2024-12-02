@@ -1,0 +1,421 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <!-- Post Header -->
+    <% if (post.cover_image) { %>
+        <div class="post-cover mb-4">
+            <div class="position-relative">
+                <img src="/media/blog/<%= post.slug %>/cover" 
+                     class="w-100 rounded" 
+                     alt="<%= post.title %>"
+                     style="max-height: 400px; object-fit: cover;">
+                <div class="position-absolute bottom-0 start-0 w-100 p-4" 
+                     style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 text-white">
+                                <% if (post.tags?.length > 0) { %>
+                                    <div class="mb-3">
+                                        <% post.tags.forEach(tag => { %>
+                                            <span class="badge bg-primary me-1"><%= tag %></span>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                                <h1 class="display-4 mb-3"><%= post.title %></h1>
+                                <div class="d-flex gap-3 align-items-center">
+                                    <% if (post.author) { %>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="https://cdn.discordapp.com/avatars/<%= post.author.id %>/<%= post.author.avatar %>.png"
+                                                 class="rounded-circle" 
+                                                 alt="<%= post.author.username %>"
+                                                 width="32" height="32">
+                                            <span><%= post.author.username %></span>
+                                        </div>
+                                    <% } %>
+                                    <span>•</span>
+                                    <div>
+                                        <i class="bi bi-calendar me-1"></i>
+                                        <%= new Date(post.published_at).toLocaleDateString() %>
+                                    </div>
+                                    
+                                    <% if (isAuthenticated && user.roles?.includes('admin')) { %>
+                                        <div class="ms-auto d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-light" onclick="openImageUploader()">
+                                                <i class="bi bi-image me-1"></i>Add Image
+                                            </button>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Image Upload Modal -->
+    <% if (isAuthenticated && user.roles?.includes('admin')) { %>
+        <div class="modal fade" id="imageUploadModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="imageUploadForm">
+                            <div class="mb-3">
+                                <label class="form-label">Select Image</label>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="imageInput" 
+                                       accept="image/*" 
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image Type</label>
+                                <select class="form-select" id="imageType">
+                                    <option value="content">Content Image</option>
+                                    <option value="cover">Cover Image</option>
+                                </select>
+                            </div>
+                            <div id="imagePreview" class="mb-3 d-none">
+                                <img src="" class="img-fluid rounded" alt="Preview">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="uploadImage()">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="row">
+                <!-- Table of Contents Sidebar -->
+                <div class="col-lg-3 d-none d-lg-block">
+                    <div class="sticky-top pt-4" style="top: 80px;">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Contents</h6>
+                                <nav id="toc" class="nav flex-column"></nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <article class="blog-post">
+                        <% if (!post.coverImage) { %>
+                            <h1 class="mb-4"><%= post.title %></h1>
+                            <div class="d-flex gap-3 mb-4 text-body-secondary">
+                                <% if (post.author) { %>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="https://cdn.discordapp.com/avatars/<%= post.author.id %>/<%= post.author.avatar %>.png"
+                                             class="rounded-circle" 
+                                             alt="<%= post.author.username %>"
+                                             width="24" height="24">
+                                        <%= post.author.username %>
+                                    </div>
+                                <% } %>
+                                <div>
+                                    <i class="bi bi-calendar me-1"></i>
+                                    <%= new Date(post.published_at).toLocaleDateString() %>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <div class="blog-content markdown-body">
+                            <%- content %>
+                        </div>
+
+                        <!-- Share Buttons -->
+                        <div class="d-flex gap-2 mt-4 pt-4 border-top">
+                            <button class="btn btn-outline-primary" onclick="share('twitter')">
+                                <i class="bi bi-twitter"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="share('facebook')">
+                                <i class="bi bi-facebook"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="share('linkedin')">
+                                <i class="bi bi-linkedin"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="copyLink()">
+                                <i class="bi bi-link-45deg"></i>
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- Post Navigation -->
+                    <div class="row g-4 my-4">
+                        <% if (previousPost) { %>
+                            <div class="col-6">
+                                <a href="/blog/<%= previousPost.slug %>" class="card text-decoration-none h-100">
+                                    <div class="card-body">
+                                        <small class="text-body-secondary d-block mb-1">Previous Post</small>
+                                        <h6 class="card-title mb-0"><%= previousPost.title %></h6>
+                                    </div>
+                                </a>
+                            </div>
+                        <% } %>
+                        <% if (nextPost) { %>
+                            <div class="col-6">
+                                <a href="/blog/<%= nextPost.slug %>" class="card text-decoration-none h-100">
+                                    <div class="card-body text-end">
+                                        <small class="text-body-secondary d-block mb-1">Next Post</small>
+                                        <h6 class="card-title mb-0"><%= nextPost.title %></h6>
+                                    </div>
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- Related Posts -->
+                    <% if (relatedPosts?.length > 0) { %>
+                        <div class="mt-5">
+                            <h5 class="mb-4">Related Posts</h5>
+                            <div class="row row-cols-1 row-cols-md-2 g-4">
+                                <% relatedPosts.forEach(related => { %>
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <% if (related.cover_image) { %>
+                                                <img src="/media/blog/<%= related.slug %>/cover" 
+                                                     class="card-img-top" 
+                                                     alt="<%= related.title %>"
+                                                     style="height: 150px; object-fit: cover;"
+                                                     loading="lazy">
+                                            <% } %>
+                                            <div class="card-body">
+                                                <h6 class="card-title"><%= related.title %></h6>
+                                                <p class="card-text small text-body-secondary">
+                                                    <%= related.excerpt || related.content.substring(0, 100) + '...' %>
+                                                </p>
+                                                <a href="/blog/<%= related.slug %>" class="btn btn-outline-primary btn-sm">Read More</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.blog-content h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    scroll-margin-top: 100px;
+}
+
+.blog-content pre {
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.blog-content blockquote {
+    border-left: 4px solid var(--bs-primary);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--bs-secondary-color);
+}
+
+#toc .nav-link {
+    padding: 0.25rem 0;
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+}
+
+#toc .nav-link:hover {
+    color: var(--bs-primary);
+}
+
+#toc .nav-link.active {
+    color: var(--bs-primary);
+    font-weight: 500;
+}
+
+#imagePreview img {
+    max-height: 300px;
+    width: auto;
+    margin: 0 auto;
+    display: block;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Highlight.js
+    document.querySelectorAll('.blog-content pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+
+    // Generate Table of Contents
+    const toc = document.getElementById('toc')
+    const headings = document.querySelectorAll('.blog-content h2, .blog-content h3')
+    
+    headings.forEach((heading, index) => {
+        const id = `heading-${index}`
+        heading.id = id
+        
+        const link = document.createElement('a')
+        link.href = `#${id}`
+        link.className = `nav-link ${heading.tagName === 'H3' ? 'ms-3' : ''}`
+        link.textContent = heading.textContent
+        toc.appendChild(link)
+    })
+    
+    // Update active TOC link on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                document.querySelectorAll('#toc .nav-link').forEach(link => {
+                    link.classList.remove('active')
+                    if (link.getAttribute('href') === `#${entry.target.id}`) {
+                        link.classList.add('active')
+                    }
+                })
+            }
+        })
+    }, { rootMargin: '-100px 0px -66% 0px' })
+    
+    headings.forEach(heading => observer.observe(heading))
+})
+
+// Social sharing functions
+function share(platform) {
+    const url = encodeURIComponent(window.location.href)
+    const title = encodeURIComponent(document.title)
+    
+    const urls = {
+        twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+        linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`
+    }
+    
+    window.open(urls[platform], '_blank')
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('Link copied to clipboard!')
+    })
+}
+
+// Image upload handling
+let imageModal;
+let uploadingImage = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('imageUploadModal')) {
+        imageModal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
+        
+        // Preview image on selection
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            const file = e.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.querySelector('img').src = e.target.result;
+                    preview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.classList.add('d-none');
+            }
+        });
+    }
+});
+
+function openImageUploader() {
+    document.getElementById('imageUploadForm').reset();
+    document.getElementById('imagePreview').classList.add('d-none');
+    imageModal.show();
+}
+
+async function uploadImage() {
+    if (uploadingImage) return;
+    
+    const fileInput = document.getElementById('imageInput');
+    const typeSelect = document.getElementById('imageType');
+    
+    if (!fileInput.files[0]) {
+        alert('Please select an image');
+        return;
+    }
+    
+    uploadingImage = true;
+    const uploadButton = document.querySelector('#imageUploadModal .btn-primary');
+    const originalText = uploadButton.textContent;
+    uploadButton.textContent = 'Uploading...';
+    uploadButton.disabled = true;
+    
+    try {
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        formData.append('type', typeSelect.value);
+        formData.append('postId', '<%= post.id %>');
+        
+        const response = await fetch('/blog/upload/image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Insert image URL into content
+            const imageUrl = data.url;
+            const imageHtml = `<img src="${imageUrl}" class="img-fluid rounded my-3" alt="Uploaded image">`;
+            
+            if (typeSelect.value === 'cover') {
+                // Reload page to show new cover
+                location.reload();
+            } else {
+                // Insert content image at cursor or append to content
+                const content = document.querySelector('.blog-content');
+                content.insertAdjacentHTML('beforeend', imageHtml);
+            }
+            
+            imageModal.hide();
+        } else {
+            throw new Error(data.error || 'Upload failed');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        alert('Failed to upload image: ' + error.message);
+    } finally {
+        uploadingImage = false;
+        uploadButton.textContent = originalText;
+        uploadButton.disabled = false;
+    }
+}
+</script>
+
+<%- include('../partials/footer') %> 

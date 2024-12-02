@@ -6,6 +6,11 @@ import { config } from '../config'
 import { scanMediaDirectory } from './media'
 import { Suggestion } from '../types/suggestion'
 import { supabase } from './supabase'
+import sanitizeHtml from 'sanitize-html'
+import sharp from 'sharp'
+import axios from 'axios'
+import { createHash } from 'crypto'
+import { Readable } from 'stream'
 
 class Storage {
 	private users: UserStore = {}
@@ -176,7 +181,6 @@ class Storage {
 	async getAnime(id: string): Promise<Anime | null> {
 		await this.refreshAnimeCache()
 		if (id === 'undefined') return null
-		console.log(this.animeCache)
 		return this.animeCache.get(id) || null
 	}
 
@@ -414,6 +418,120 @@ class Storage {
 		this.animeCache.delete(animeId)
 		// Force a cache refresh on next fetch
 		this.lastCacheUpdate = 0
+	}
+
+	// Blog methods
+	async saveBlogImage(slug: string, imageType: 'cover' | 'content', file: Express.Multer.File): Promise<string> {
+		const mediaDir = path.join(config.blogMedia, slug)
+		
+		try {
+			// Create directory if it doesn't exist
+			await fs.mkdir(mediaDir, { recursive: true })
+			
+			// Process image with sharp
+			const image = sharp(file.buffer)
+			
+			// Resize based on image type
+			if (imageType === 'cover') {
+				await image
+					.resize(1200, 630, { fit: 'cover' })
+					.jpeg({ quality: 80 })
+					.toFile(path.join(mediaDir, 'cover.jpg'))
+			} else {
+				// Content images are resized to max width while maintaining aspect ratio
+				await image
+					.resize(800, null, { fit: 'inside' })
+					.jpeg({ quality: 80 })
+					.toFile(path.join(mediaDir, `${file.originalname}.jpg`))
+			}
+			
+			return imageType === 'cover' ? 'cover.jpg' : `${file.originalname}.jpg`
+		} catch (error) {
+			console.error('Error saving blog image:', error)
+			throw error
+		}
+	}
+
+	async sanitizeBlogContent(content: string): Promise<string> {
+		return sanitizeHtml(content, {
+			allowedTags: [
+				'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+				'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+				'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'img'
+			],
+			allowedAttributes: {
+				a: ['href', 'name', 'target'],
+				img: ['src', 'alt', 'title', 'width', 'height'],
+				'*': ['class', 'id']
+			},
+			allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel'],
+			transformTags: {
+				'a': (tagName, attribs) => ({
+					tagName,
+					attribs: {
+						...attribs,
+						target: '_blank',
+						rel: 'noopener noreferrer'
+					}
+				})
+			}
+		})
+	}
+
+	async downloadImage(url: string, slug: string): Promise<string | null> {
+		try {
+			const response = await axios.get(url, { responseType: 'arraybuffer' })
+			const buffer = Buffer.from(response.data, 'binary')
+			
+			// Create hash of image data for unique filename
+			const hash = createHash('md5').update(buffer).digest('hex')
+			const filename = `${hash}.jpg`
+			
+			// Save the image using our existing method
+			const file: Express.Multer.File = {
+				buffer,
+				originalname: filename,
+				fieldname: 'image',
+				encoding: '7bit',
+				mimetype: 'image/jpeg',
+				size: buffer.length,
+				stream: Readable.from(buffer),
+				destination: '',
+				filename: '',
+				path: ''
+			}
+
+			await this.saveBlogImage(slug, 'content', file)
+			return filename
+		} catch (error) {
+			console.error('Error downloading image:', error)
+			return null
+		}
+	}
+
+	async processBlogContent(content: string, slug: string): Promise<string> {
+		const imgRegex = /<img[^>]+src="([^">]+)"/g
+		let match
+		let processedContent = content
+		
+		// Find all image URLs in the content
+		while ((match = imgRegex.exec(content)) !== null) {
+			const imageUrl = match[1]
+			
+			// Only process external URLs
+			if (imageUrl.startsWith('http')) {
+				const filename = await this.downloadImage(imageUrl, slug)
+				if (filename) {
+					// Replace external URL with local URL
+					processedContent = processedContent.replace(
+						imageUrl,
+						`/media/blog/${slug}/${filename}`
+					)
+				}
+			}
+		}
+		
+		return processedContent
 	}
 }
 

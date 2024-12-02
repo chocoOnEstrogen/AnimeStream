@@ -29,6 +29,7 @@ export const config = {
 	discord: {
 		clientId: process.env.DISCORD_CLIENT_ID!,
 		clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+		invite: 'https://discord.gg/u8V7dthN',
 	},
 
 	session: {
@@ -36,4 +37,5 @@ export const config = {
 	},
 
 	media: ['/home/neko/Anime'],
+	blogMedia: path.join(__dirname, '../data/blog'),
 }

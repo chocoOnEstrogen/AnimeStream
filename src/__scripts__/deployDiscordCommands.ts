@@ -20,10 +20,7 @@ export const deployCommands = async () => {
 
 	const missingVars = requiredEnvVars.filter((key) => !process.env[key])
 	if (missingVars.length > 0) {
-		console.error(
-			`Missing environment variables: ${missingVars.join(', ')}`,
-			'Commands',
-		)
+		console.error(`Missing environment variables: ${missingVars.join(', ')}`)
 		process.exit(1)
 	}
 
@@ -60,16 +57,13 @@ export const deployCommands = async () => {
 
 		// Deploy commands
 		const rest = new REST({ version: '10' }).setToken(token)
-		console.log(
-			`Deploying ${commands.length} application (/) commands...`,
-			'Commands',
-		)
+		console.log(`Deploying ${commands.length} application (/) commands...`)
 
 		await rest.put(Routes.applicationCommands(clientId), {
 			body: commands,
 		})
 
-		console.log('Successfully deployed application (/) commands.', 'Commands')
+		console.log('Successfully deployed application (/) commands.')
 	} catch (error) {
 		console.error(`Failed to deploy commands: ${error}`)
 		process.exit(1)
