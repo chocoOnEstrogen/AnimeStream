@@ -86,39 +86,37 @@
 
                 <!-- User Menu -->
                 <div class="nav-item">
-                    <% if (isAuthenticated && user) { %>
+                    <% if (isAuthenticated) { %>
                         <div class="dropdown">
-                            <button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center gap-2" 
+                            <button class="btn btn-link nav-link dropdown-toggle p-0" 
                                     type="button" 
+                                    id="userDropdown" 
                                     data-bs-toggle="dropdown" 
                                     aria-expanded="false">
                                 <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" 
-                                     alt="Avatar"
+                                     alt="Avatar" 
                                      class="rounded-circle"
-                                     width="32"
-                                     height="32"
-                                     loading="lazy">
-                                <span class="d-none d-sm-inline"><%= user.username %></span>
+                                     width="32" 
+                                     height="32">
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="/users/profile">
                                         <i class="bi bi-person me-2"></i>Profile
                                     </a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" href="/users/settings">
-                                        <i class="bi bi-gear me-2"></i>Settings
-                                    </a>
-                                </li>
                                 <% if (user.roles.includes('admin')) { %>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="/admin">
                                             <i class="bi bi-shield-lock me-2"></i>Admin Panel
                                         </a>
                                     </li>
                                 <% } %>
+                                <li>
+                                    <a class="dropdown-item" href="/users/settings">
+                                        <i class="bi bi-gear me-2"></i>Settings
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="/auth/logout">
@@ -136,6 +134,9 @@
             </div>
         </div>
     </nav>
+
+    <!-- System Alerts -->
+    <%- include('alerts') %>
 
     <!-- Main Content -->
     <main class="py-4">

@@ -315,4 +315,62 @@ router.get('/blog/:id', async (req: Request, res: Response) => {
 	}
 })
 
+router.get('/alerts', async (req: Request, res: Response) => {
+    try {
+        const { data: alerts } = await supabase
+            .from('system_alerts')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+        render(req, res, 'admin/alerts', {
+            title: 'System Alerts',
+            alerts: alerts || []
+        })
+    } catch (error) {
+        console.error('System alerts error:', error)
+        render(req, res, 'error', {
+            title: 'Error',
+            error: 'Failed to load system alerts'
+        })
+    }
+})
+
+router.post('/alerts', async (req: Request, res: Response) => {
+    try {
+        const { message, type } = req.body
+        const { data, error } = await supabase
+            .from('system_alerts')
+            .insert([{
+                id: crypto.randomUUID(),
+                message,
+                type,
+                created_at: new Date().toISOString()
+            }])
+            .select()
+            .single()
+
+        if (error) throw error
+        res.json(data)
+    } catch (error) {
+        console.error('Create alert error:', error)
+        res.status(500).json({ error: 'Failed to create alert' })
+    }
+})
+
+router.delete('/alerts/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        const { error } = await supabase
+            .from('system_alerts')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+        res.json({ success: true })
+    } catch (error) {
+        console.error('Delete alert error:', error)
+        res.status(500).json({ error: 'Failed to delete alert' })
+    }
+})
+
 export default router

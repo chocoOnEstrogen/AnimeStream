@@ -1,0 +1,10 @@
+<% if (alerts && alerts.length > 0) { %>
+    <div class="system-alerts" style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 1030;">
+        <% alerts.forEach(alert => { %>
+            <div class="alert alert-<%= alert.type === 'error' ? 'danger' : alert.type %> alert-dismissible fade show m-0" role="alert">
+                <%= alert.message %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% }); %>
+    </div>
+<% } %> 

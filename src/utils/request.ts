@@ -3,13 +3,14 @@ import * as constants from '../constants'
 import { config } from '../config'
 import { User } from '../types/user'
 import { cache as botCache } from './discord'
+import { supabase } from '../utils/supabase'
 
 interface RenderData {
 	title?: string
 	[key: string]: any
 }
 
-export const render = (
+export const render = async (
 	req: Request,
 	res: Response,
 	template: string,
@@ -34,6 +35,13 @@ export const render = (
 		uptime: null
 	}
 
+	// Fetch active system alerts
+	const { data: alerts } = await supabase
+		.from('system_alerts')
+		.select('*')
+		.order('created_at', { ascending: false })
+		.limit(5)
+
 	res.render(template, {
 		...data,
 		path,
@@ -42,7 +50,8 @@ export const render = (
 		constants,
 		config,
 		flash: (req as any).flash,
-			botStatus: botData,
+		botStatus: botData,
+		alerts: alerts || [],
 		title: data.title ? `${data.title} - ${constants.APP_NAME}` : constants.APP_NAME,
 	})
 }

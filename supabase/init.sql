@@ -70,6 +70,14 @@ CREATE TABLE guilds (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- System alerts table
+CREATE TABLE system_alerts (
+  id TEXT PRIMARY KEY,
+  message TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('info', 'warning', 'error')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_users_roles ON users USING GIN (roles);
 CREATE INDEX idx_watch_history_timestamp ON watch_history (timestamp DESC);
@@ -85,3 +93,5 @@ CREATE INDEX idx_blog_tags ON blog USING GIN (tags);
 -- Create index for the guilds table
 CREATE INDEX idx_guilds_updates_channel_id ON guilds (updates_channel_id);
 
+-- Create index for the system_alerts table
+CREATE INDEX idx_system_alerts_type ON system_alerts (type);
