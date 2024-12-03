@@ -78,6 +78,23 @@ CREATE TABLE system_alerts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Security Advisories table
+CREATE TABLE security_advisories (
+    id TEXT PRIMARY KEY,
+    cve_id TEXT UNIQUE,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft',
+    affected_versions TEXT[],
+    fixed_versions TEXT[],
+    published_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    author_id TEXT REFERENCES users(id),
+    metadata JSONB DEFAULT '{}'::jsonb
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_users_roles ON users USING GIN (roles);
 CREATE INDEX idx_watch_history_timestamp ON watch_history (timestamp DESC);
@@ -95,3 +112,9 @@ CREATE INDEX idx_guilds_updates_channel_id ON guilds (updates_channel_id);
 
 -- Create index for the system_alerts table
 CREATE INDEX idx_system_alerts_type ON system_alerts (type);
+
+-- Add indexes for the security_advisories table
+CREATE INDEX idx_security_cve_id ON security_advisories (cve_id);
+CREATE INDEX idx_security_status ON security_advisories (status);
+CREATE INDEX idx_security_severity ON security_advisories (severity);
+CREATE INDEX idx_security_published_at ON security_advisories (published_at DESC);

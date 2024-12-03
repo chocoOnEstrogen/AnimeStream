@@ -1,0 +1,255 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Security Management</h1>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="createAdvisory()">
+                <i class="bi bi-plus-lg"></i> New Advisory
+            </button>
+            <a href="/admin" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Advisories Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Security Advisories</h5>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="filterAdvisories('all')">All</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="filterAdvisories('draft')">Drafts</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="filterAdvisories('published')">Published</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>CVE ID</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Published</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% advisories.forEach(advisory => { %>
+                        <tr data-status="<%= advisory.status %>">
+                            <td><%= advisory.title %></td>
+                            <td><code><%= advisory.cve_id %></code></td>
+                            <td>
+                                <span class="badge bg-<%= advisory.severity === 'critical' ? 'danger' : 
+                                                       advisory.severity === 'high' ? 'warning' : 
+                                                       advisory.severity === 'medium' ? 'info' : 'success' %>">
+                                    <%= advisory.severity.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-<%= advisory.status === 'published' ? 'success' : 'secondary' %>">
+                                    <%= advisory.status.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td>
+                                <% if (advisory.published_at) { %>
+                                    <%= new Date(advisory.published_at).toLocaleDateString() %>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="editAdvisory('<%= advisory.id %>')">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <a href="/security/<%= advisory.cve_id %>" class="btn btn-outline-secondary" target="_blank">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger" onclick="deleteAdvisory('<%= advisory.id %>')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Advisory Modal -->
+    <div class="modal fade" id="advisoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Security Advisory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="advisoryForm" onsubmit="saveAdvisory(event)">
+                        <input type="hidden" id="advisoryId">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CVE ID</label>
+                            <input type="text" class="form-control" id="cveId" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Severity</label>
+                                <select class="form-select" id="severity" required>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="status" required>
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Published</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (Markdown)</label>
+                            <textarea class="form-control font-monospace" id="description" rows="10" required></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Affected Versions</label>
+                                <input type="text" class="form-control" id="affectedVersions" placeholder="1.0.0, 1.1.0">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Fixed Versions</label>
+                                <input type="text" class="form-control" id="fixedVersions" placeholder="1.2.0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="advisoryForm" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let modal
+let currentId = null
+
+document.addEventListener('DOMContentLoaded', function() {
+    modal = new bootstrap.Modal(document.getElementById('advisoryModal'))
+})
+
+function createAdvisory() {
+    currentId = null
+    document.getElementById('advisoryForm').reset()
+    document.getElementById('cveId').value = 'CVE-' + new Date().getFullYear() + '-'
+    modal.show()
+}
+
+async function editAdvisory(id) {
+    try {
+        const res = await fetch(`/admin/security/${id}`)
+        if (!res.ok) throw new Error('Failed to load advisory')
+        
+        const advisory = await res.json()
+        currentId = advisory.id
+        
+        document.getElementById('advisoryId').value = advisory.id
+        document.getElementById('title').value = advisory.title
+        document.getElementById('cveId').value = advisory.cve_id
+        document.getElementById('severity').value = advisory.severity
+        document.getElementById('status').value = advisory.status
+        document.getElementById('description').value = advisory.description
+        document.getElementById('affectedVersions').value = advisory.affected_versions?.join(', ') || ''
+        document.getElementById('fixedVersions').value = advisory.fixed_versions?.join(', ') || ''
+        
+        modal.show()
+    } catch (error) {
+        console.error('Edit error:', error)
+        alert('Failed to load advisory')
+    }
+}
+
+async function saveAdvisory(event) {
+    event.preventDefault()
+    
+    try {
+        const data = {
+            title: document.getElementById('title').value,
+            cve_id: document.getElementById('cveId').value,
+            severity: document.getElementById('severity').value,
+            status: document.getElementById('status').value,
+            description: document.getElementById('description').value,
+            affected_versions: document.getElementById('affectedVersions').value.split(',').map(v => v.trim()).filter(Boolean),
+            fixed_versions: document.getElementById('fixedVersions').value.split(',').map(v => v.trim()).filter(Boolean)
+        }
+        
+        const res = await fetch(`/admin/security/${currentId || ''}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        
+        if (!res.ok) throw new Error('Failed to save advisory')
+        
+        const result = await res.json()
+        if (result.success) {
+            modal.hide()
+            location.reload()
+        } else {
+            alert('Failed to save advisory')
+        }
+    } catch (error) {
+        console.error('Save error:', error)
+        alert('Failed to save advisory')
+    }
+}
+
+async function deleteAdvisory(id) {
+    if (!confirm('Are you sure you want to delete this advisory?')) return
+    
+    try {
+        const res = await fetch(`/admin/security/${id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Failed to delete advisory')
+        const result = await res.json()
+        if (result.success) {
+            location.reload()
+        } else {
+            alert('Failed to delete advisory')
+        }
+    } catch (error) {
+        console.error('Delete error:', error)
+        alert('Failed to delete advisory')
+    }
+}
+
+function filterAdvisories(status) {
+    const rows = document.querySelectorAll('tbody tr')
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = ''
+        } else {
+            row.style.display = 'none'
+        }
+    })
+    
+    // Update active button state
+    const buttons = document.querySelectorAll('.card-header .btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    event.target.classList.add('active')
+}
+</script>
+
+<%- include('../partials/footer') %> 

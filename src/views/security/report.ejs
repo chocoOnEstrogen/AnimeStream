@@ -1,0 +1,166 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/security">Security Advisories</a></li>
+                    <li class="breadcrumb-item active">Report Vulnerability</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-4">Report Security Vulnerability</h1>
+
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="bi bi-shield-lock"></i> Responsible Disclosure</h5>
+                        <p class="mb-0">
+                            Thank you for helping keep our platform secure. Please provide as much detail as possible
+                            about the vulnerability. We will investigate all legitimate reports and respond as quickly
+                            as possible.
+                        </p>
+                    </div>
+
+                    <form id="reportForm" onsubmit="submitReport(event)">
+                        <!-- Contact Info (for non-authenticated users) -->
+                        <% if (!isAuthenticated) { %>
+                            <div class="mb-4">
+                                <h5>Contact Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" class="form-control" name="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" name="email" required>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <!-- Vulnerability Details -->
+                        <div class="mb-4">
+                            <h5>Vulnerability Details</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="title" 
+                                       required
+                                       placeholder="Brief description of the vulnerability">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Severity</label>
+                                <select class="form-select" name="severity" required>
+                                    <option value="">Select severity...</option>
+                                    <option value="low">Low - Minimal impact</option>
+                                    <option value="medium">Medium - Some impact</option>
+                                    <option value="high">High - Significant impact</option>
+                                    <option value="critical">Critical - Severe impact</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" 
+                                          name="description" 
+                                          rows="4" 
+                                          required
+                                          placeholder="Detailed description of the vulnerability"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Steps to Reproduce</label>
+                                <textarea class="form-control" 
+                                          name="steps" 
+                                          rows="4" 
+                                          required
+                                          placeholder="1. Step one&#10;2. Step two&#10;3. Step three"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Potential Impact</label>
+                                <textarea class="form-control" 
+                                          name="impact" 
+                                          rows="3" 
+                                          required
+                                          placeholder="Describe the potential impact of this vulnerability"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Submit Report
+                            </button>
+                            <a href="/security" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function submitReport(event) {
+    event.preventDefault()
+    const form = event.target
+    const submitButton = form.querySelector('button[type="submit"]')
+    const originalText = submitButton.innerHTML
+    
+    try {
+        submitButton.disabled = true
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...'
+        
+        // Create a proper JSON object from form data
+        const data = {
+            title: form.querySelector('[name="title"]').value,
+            description: form.querySelector('[name="description"]').value,
+            severity: form.querySelector('[name="severity"]').value,
+            steps: form.querySelector('[name="steps"]').value,
+            impact: form.querySelector('[name="impact"]').value
+        }
+
+        // Add contact info if present
+        const nameInput = form.querySelector('[name="name"]')
+        const emailInput = form.querySelector('[name="email"]')
+        if (nameInput && emailInput) {
+            data.name = nameInput.value
+            data.email = emailInput.value
+        }
+        
+        const res = await fetch('/security/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        
+        const result = await res.json()
+        if (!res.ok) throw new Error(result.error || 'Failed to submit report')
+        
+        // Show success message and redirect
+        alert('Thank you for your report. We will investigate and respond as soon as possible.')
+        window.location.href = '/security'
+    } catch (error) {
+        console.error('Submit error:', error)
+        alert(error.message || 'Failed to submit report. Please try again.')
+    } finally {
+        submitButton.disabled = false
+        submitButton.innerHTML = originalText
+    }
+}
+
+// Initialize Bootstrap components
+document.addEventListener('DOMContentLoaded', function() {
+    // Any Bootstrap initialization can go here
+})
+</script>
+
+<%- include('../partials/footer') %>

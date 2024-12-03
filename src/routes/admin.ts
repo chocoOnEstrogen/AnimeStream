@@ -373,4 +373,80 @@ router.delete('/alerts/:id', async (req: Request, res: Response) => {
     }
 })
 
+router.get('/security', requireAdmin, async (req: Request, res: Response) => {
+    try {
+        const { data: advisories } = await supabase
+            .from('security_advisories')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+        render(req, res, 'admin/security', {
+            title: 'Security Management',
+            advisories: advisories || []
+        })
+    } catch (error) {
+        console.error('Security management error:', error)
+        res.status(500).render('error', {
+            error: 'Failed to load security management'
+        })
+    }
+})
+
+// Create/Update advisory
+router.post('/security/:id?', requireAdmin, async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        const { title, cveId, description, severity, status, affectedVersions, fixedVersions } = req.body
+        const wasPublished = status === 'published'
+
+        const data = {
+            title,
+            cve_id: cveId,
+            description,
+            severity,
+            status,
+            affected_versions: affectedVersions,
+            fixed_versions: fixedVersions,
+            author_id: (req as any).user.id,
+            published_at: wasPublished ? new Date().toISOString() : null,
+            updated_at: new Date().toISOString()
+        }
+
+		console.log(JSON.stringify(data, null, 4))
+
+        let result
+        if (id) {
+            result = await supabase
+                .from('security_advisories')
+                .update(data)
+                .eq('id', id)
+        } else {
+            result = await supabase
+                .from('security_advisories')
+                .insert([data])
+        }
+
+        if (result.error) throw result.error
+        res.json({ success: true })
+    } catch (error) {
+        console.error('Save security advisory error:', error)
+        res.status(500).json({ error: 'Failed to save security advisory' })
+    }
+})
+
+// Delete security advisory
+router.delete('/security/:id', requireAdmin, async (req: Request, res: Response) => {
+    const { id } = req.params
+    await supabase.from('security_advisories').delete().eq('id', id)
+    res.json({ success: true })
+})
+
+// Get security advisory
+router.get('/security/:id', requireAdmin, async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { data, error } = await supabase.from('security_advisories').select('*').eq('id', id).single()
+    if (error) throw error
+    res.json(data)
+})
+
 export default router

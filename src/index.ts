@@ -27,6 +27,7 @@ import blogRouter from './routes/blog'
 import cron from 'node-cron'
 import { getBotStatus } from './utils/discord'
 import botRouter from './routes/bot'
+import securityRouter from './routes/security'
 
 dotenv.config()
 
@@ -303,6 +304,7 @@ app.use('/api', apiRouter)
 app.use('/docs', docsRouter)
 app.use('/blog', blogRouter)
 app.use('/bot', botRouter)
+app.use('/security', securityRouter)
 
 // Basic error handler
 app.use(
