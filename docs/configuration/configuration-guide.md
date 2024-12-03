@@ -33,6 +33,9 @@ SUPABASE_ANON_KEY=      # Your Supabase anonymous key
 
 # Media Configuration
 MEDIA_PATHS=            # Paths to your media directories (comma separated)
+
+# GitHub Configuration
+GITHUB_WEBHOOK_SECRET= # Your GitHub webhook secret
 ```
 
 ### Optional Variables

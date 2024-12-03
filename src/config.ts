@@ -39,4 +39,8 @@ export const config = {
 
 	media: parseMediaConfig(process.env.MEDIA_PATHS || ''),
 	blogMedia: path.join(__dirname, '../data/blog'),
+
+	github: {
+		webhookSecret: process.env.GITHUB_WEBHOOK_SECRET || '',
+	}
 }
