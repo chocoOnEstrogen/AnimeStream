@@ -49,3 +49,6 @@ coverage/
 
 # Ignore data directory
 data/
+
+# PM2 Logs
+logs/
