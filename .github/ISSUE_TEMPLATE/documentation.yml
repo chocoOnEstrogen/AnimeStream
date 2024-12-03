@@ -1,0 +1,48 @@
+name: 📝 Documentation
+description: Report issues with documentation or suggest improvements
+title: "[DOCS] "
+labels: ["documentation"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Documentation Issue Type
+      options:
+        - Missing Documentation
+        - Incorrect Information
+        - Unclear Explanation
+        - Outdated Content
+        - Typo/Grammar
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Documentation Page
+      description: Which page or section needs attention?
+      placeholder: e.g., Installation Guide, API Reference
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe what needs to be changed or added
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Changes
+      description: If you have specific suggestions for improvement, please provide them
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to contribute to fixing this documentation issue

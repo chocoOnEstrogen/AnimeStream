@@ -1,83 +1,125 @@
-name: Bug report
-description: Create a report to help us improve
+name: 🐛 Bug Report
+description: Report a bug to help us improve AnimeStream
 title: "[BUG] "
-labels: 
-  - bug
+labels: ["bug", "triage"]
+assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        **Describe the bug**
-        A clear and concise description of what the bug is.
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please ensure you've completed these steps before submitting
+      options:
+        - label: I have searched existing issues to avoid creating duplicates
+          required: true
+        - label: I am running the latest version of the software
+          required: true
+        - label: I have cleared my browser cache and cookies
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the bug
+      placeholder: When I... the application... instead of...
+    validations:
+      required: true
 
   - type: textarea
     id: reproduce
     attributes:
-      label: "To Reproduce"
-      description: "Steps to reproduce the behavior"
-      placeholder: "1. Go to '...'\n2. Click on '....'\n3. Scroll down to '....'\n4. See error"
-
-  - type: input
-    id: expected
-    attributes:
-      label: "Expected behavior"
-      description: "A clear and concise description of what you expected to happen"
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. Observe error
+    validations:
+      required: true
 
   - type: textarea
-    id: screenshots
+    id: expected
     attributes:
-      label: "Screenshots"
-      description: "If applicable, add screenshots to help explain your problem"
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Please copy and paste any relevant log output. This will be automatically formatted.
+      render: shell
 
   - type: dropdown
-    id: desktop-info
+    id: environment
     attributes:
-      label: "Desktop (please complete the following information)"
+      label: Environment
+      description: Where does this issue occur?
+      options:
+        - Production
+        - Development
+        - Both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Browsers Affected
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - Other
+
+  - type: input
+    id: version-browser
+    attributes:
+      label: Browser Version
+      placeholder: e.g., Chrome 120.0.6099.109
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      multiple: true
       options:
         - Windows
         - macOS
         - Linux
-
-  - type: input
-    id: browser
-    attributes:
-      label: "Browser"
-      description: "e.g. Chrome, Firefox, Safari"
-  
-  - type: input
-    id: version
-    attributes:
-      label: "Version"
-      description: "e.g. 22"
-
-  - type: input
-    id: smartphone
-    attributes:
-      label: "Smartphone (please complete the following information)"
-      description: "Device (e.g. iPhone6, Samsung Galaxy S10)"
-  
-  - type: dropdown
-    id: smartphone-os
-    attributes:
-      label: "OS"
-      options:
         - iOS
         - Android
+        - Other
 
   - type: input
-    id: smartphone-browser
+    id: version-app
     attributes:
-      label: "Browser"
-      description: "e.g. stock browser, Safari"
-
-  - type: input
-    id: smartphone-version
-    attributes:
-      label: "Version"
-      description: "e.g. 22"
+      label: AnimeStream Version
+      placeholder: e.g., 1.0.0
+    validations:
+      required: true
 
   - type: textarea
-    id: additional-context
+    id: screenshots
     attributes:
-      label: "Additional context"
-      description: "Add any other context about the problem here"
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem
+      placeholder: Drag and drop images here
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here

@@ -1,0 +1,64 @@
+name: 🔒 Security Issue
+description: Report a security vulnerability
+title: "[SECURITY] "
+labels: ["security", "confidential"]
+assignees: ["chocoOnEstrogen"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ IMPORTANT: For critical security vulnerabilities, please report via email to security@choco.rip instead.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this security issue?
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+        - Informational
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Vulnerability Description
+      description: Describe the security vulnerability
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: What's the potential impact of this vulnerability?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the vulnerability
+    validations:
+      required: true
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Suggested Mitigation
+      description: If you have suggestions for fixing the vulnerability, please provide them
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Security Report Agreement
+      options:
+        - label: I have not disclosed this vulnerability publicly
+          required: true
+        - label: I understand this report will be handled confidentially
+          required: true 
