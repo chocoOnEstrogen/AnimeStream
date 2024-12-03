@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import path from 'path'
+import { parseMediaConfig } from './utils/mediaConfig'
 
 // Load environment variables
 dotenv.config()
@@ -36,6 +37,6 @@ export const config = {
 		secret: process.env.SESSION_SECRET!,
 	},
 
-	media: ['/home/neko/Anime'],
+	media: parseMediaConfig(process.env.MEDIA_PATHS || ''),
 	blogMedia: path.join(__dirname, '../data/blog'),
 }

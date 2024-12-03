@@ -30,6 +30,9 @@ BASE_URL=               # Your application's base URL
 # Database Configuration
 SUPABASE_URL=           # Your Supabase project URL
 SUPABASE_ANON_KEY=      # Your Supabase anonymous key
+
+# Media Configuration
+MEDIA_PATHS=            # Paths to your media directories (comma separated)
 ```
 
 ### Optional Variables
